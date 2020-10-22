@@ -14,5 +14,5 @@ data class Stat(
     @SerializedName("stat")
     val stat: ResponseResult,
 
-    var langStat: LanguageResult? = null
+    var langStat: LanguageResult
 )

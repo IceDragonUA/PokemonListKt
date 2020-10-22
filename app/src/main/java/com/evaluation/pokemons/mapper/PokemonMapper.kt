@@ -42,21 +42,21 @@ class PokemonMapper @Inject constructor() {
     fun toTableItem(item: Stat, index: Int): PokemonStatTableItem {
         return PokemonStatTableItem(
             index = index,
-            name = item.langStat?.names?.get(0)?.name.defIfNull()
+            name = item.langStat.names[0].name.defIfNull()
         )
     }
 
     fun toTableItem(item: Ability, index: Int): PokemonAbilityTableItem {
         return PokemonAbilityTableItem(
             index = index,
-            name = item.langAbility?.names?.get(0)?.name.defIfNull()
+            name = item.langAbility.names[0].name.defIfNull()
         )
     }
 
     fun toTableItem(item: Type, index: Int): PokemonTypeTableItem {
         return PokemonTypeTableItem(
             index = index,
-            name = item.langType?.names?.get(0)?.name.defIfNull()
+            name = item.langType.names[0].name.defIfNull()
         )
     }
 

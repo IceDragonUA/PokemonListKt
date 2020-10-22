@@ -16,6 +16,13 @@ data class PokemonList(
     val previous: String?,
     @SerializedName("results")
     val results: List<ResponseResult>,
-
-    val pokemons: MutableList<Pokemon> = mutableListOf()
-)
+) {
+    private var _pokemons: MutableList<Pokemon>? = null
+    val pokemons: MutableList<Pokemon>
+        get() {
+            if (_pokemons == null) {
+                _pokemons = mutableListOf()
+            }
+            return _pokemons ?: throw AssertionError("Set to null by another thread")
+        }
+}

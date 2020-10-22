@@ -12,5 +12,5 @@ data class Type(
     @SerializedName("type")
     val type: ResponseResult,
 
-    var langType: LanguageResult? = null
+    var langType: LanguageResult
 )

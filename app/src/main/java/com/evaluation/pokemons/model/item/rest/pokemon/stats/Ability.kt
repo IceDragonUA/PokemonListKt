@@ -12,5 +12,5 @@ data class Ability(
     @SerializedName("ability")
     val ability: ResponseResult,
 
-    var langAbility: LanguageResult? = null
+    var langAbility: LanguageResult
 )

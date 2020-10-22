@@ -16,9 +16,8 @@ class CardItemHolder(itemView: View, listener: AdapterItemClickListener<CardItem
 
     override fun bind(item: CardItemView) {
         itemView.image.loadFromUrl(item.viewItem.front_default)
-        itemView.title.initText(item.viewItem.name)
-        itemView.time.initText(item.viewItem.weight.toString())
-        itemView.channel.initText(item.viewItem.height.toString())
+        itemView.name.initText(item.viewItem.name)
+        itemView.abilities.initText(item.viewItem.abilities.joinToString { it.name })
         itemView.setOnClickListener {
             listener?.onClicked(item)
         }

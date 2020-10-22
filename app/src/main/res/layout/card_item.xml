@@ -33,43 +33,30 @@
             app:layout_constraintTop_toTopOf="@id/image">
 
             <TextView
-                android:id="@+id/title"
+                android:id="@+id/name"
                 style="@style/CardText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/loading"
                 android:textColor="@color/colorLightBlack"
-                android:textSize="@dimen/card_title_text_size"
-                app:layout_constraintBottom_toTopOf="@id/time"
+                android:textSize="@dimen/card_main_text_size"
+                app:layout_constraintBottom_toTopOf="@id/abilities"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/time"
+                android:id="@+id/abilities"
                 style="@style/CardText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/loading"
                 android:textColor="@color/colorLightBlack"
-                android:textSize="@dimen/card_time_text_size"
-                app:layout_constraintBottom_toTopOf="@id/channel"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title" />
-
-            <TextView
-                android:id="@+id/channel"
-                style="@style/CardText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/loading"
-                android:textColor="@color/colorLightBlack"
-                android:textSize="@dimen/card_time_text_size"
+                android:textSize="@dimen/card_sub_text_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/time" />
+                app:layout_constraintTop_toBottomOf="@id/name" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

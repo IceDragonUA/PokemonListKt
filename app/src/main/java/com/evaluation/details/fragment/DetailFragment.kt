@@ -30,6 +30,14 @@ class DetailFragment : Fragment() {
 
     private fun initRootView(fromBundle: DetailFragmentArgs) {
         image.loadFromUrl(fromBundle.item.front_default)
+
+        weight_value.initText(fromBundle.item.weight.toString())
+        height_value.initText(fromBundle.item.height.toString())
+        experience_value.initText(fromBundle.item.experience.toString())
+
+        stats_value.initText(fromBundle.item.stats.joinToString { it.name })
+        abilities_value.initText(fromBundle.item.abilities.joinToString { it.name })
+        types_value.initText(fromBundle.item.types.joinToString { it.name })
     }
 
 }

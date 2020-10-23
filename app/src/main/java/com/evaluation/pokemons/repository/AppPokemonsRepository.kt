@@ -3,12 +3,14 @@ package com.evaluation.pokemons.repository
 import android.content.Context
 import com.evaluation.R
 import com.evaluation.adapter.viewholder.item.BaseItemView
+import com.evaluation.adapter.viewholder.item.EmptyItemView
 import com.evaluation.pokemons.adapter.viewholder.item.CardItemView
 import com.evaluation.adapter.viewholder.item.NoItemView
 import com.evaluation.pokemons.database.AppPokemonsDatabaseDao
 import com.evaluation.pokemons.mapper.PokemonMapper
 import com.evaluation.pokemons.model.item.view.language.LanguageView
 import com.evaluation.pokemons.network.AppPokemonsRestApiDao
+import com.evaluation.utils.NO_ITEM
 import com.evaluation.utils.defIfNull
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
@@ -30,6 +32,7 @@ class AppPokemonsRepository @Inject constructor(
     fun pokemonListInit(
         offset: Int,
         limit: Int,
+        query: String,
         language: String,
         onPrepared: () -> Unit,
         onSuccess: (MutableList<BaseItemView>) -> Unit,
@@ -70,7 +73,9 @@ class AppPokemonsRepository @Inject constructor(
 
 
                     val itemList: MutableList<BaseItemView> = mutableListOf()
-                    val databaseList = appDatabaseDao.pokemonList()
+                    val databaseList = if (query.isEmpty())
+                        appDatabaseDao.pokemonList() else
+                        appDatabaseDao.pokemonList(query)
                     databaseList.forEach {
                         itemList.add(
                             CardItemView(
@@ -94,7 +99,9 @@ class AppPokemonsRepository @Inject constructor(
                     Timber.e(errorMessage, "Loading error")
 
                     val itemList: MutableList<BaseItemView> = mutableListOf()
-                    val databaseList = appDatabaseDao.pokemonList()
+                    val databaseList = if (query.isEmpty())
+                        appDatabaseDao.pokemonList() else
+                        appDatabaseDao.pokemonList(query)
                     databaseList.forEach {
                         itemList.add(
                             CardItemView(
@@ -120,6 +127,7 @@ class AppPokemonsRepository @Inject constructor(
     fun pokemonListPaged(
         offset: Int,
         limit: Int,
+        query: String,
         language: String,
         onPrepared: () -> Unit,
         onSuccess: (MutableList<BaseItemView>) -> Unit,
@@ -155,14 +163,24 @@ class AppPokemonsRepository @Inject constructor(
 
 
                     val itemList: MutableList<BaseItemView> = mutableListOf()
-                    val databaseList = appDatabaseDao.pokemonPagedList(offset, limit)
-
+                    val databaseList = if (query.isEmpty())
+                        appDatabaseDao.pokemonPagedList(offset, limit) else
+                        appDatabaseDao.pokemonPagedList(offset, limit, query)
                     databaseList.forEach {
                         itemList.add(
                             CardItemView(
                                 index = it.index.defIfNull().toString(),
                                 next = pokemonList.next,
                                 viewItem = mapper.toViewItem(it)
+                            )
+                        )
+                    }
+
+                    itemList.ifEmpty {
+                        itemList.add(
+                            EmptyItemView(
+                                index = NO_ITEM + pokemonList.next,
+                                next = pokemonList.next
                             )
                         )
                     }

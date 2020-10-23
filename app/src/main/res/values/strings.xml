@@ -2,6 +2,7 @@
     <string name="app_name">Pokemons demo</string>
 
     <string name="pokemons">Pokemons</string>
+    <string name="search">Enter name</string>
     <string name="result">No results</string>
     <string name="loading">Loading...</string>
     <string name="none">-</string>

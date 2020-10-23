@@ -27,9 +27,10 @@ class AppPokemonsInteractionImpl @Inject constructor(
 ) : AppPokemonsInteraction {
 
     @MainThread
-    override fun pokemonList(language: String): Listing<BaseItemView> {
+    override fun pokemonList(language: String, query: String): Listing<BaseItemView> {
 
         factory.language = language
+        factory.query = query
 
         val liveList =
             LivePagedListBuilder(factory, config)

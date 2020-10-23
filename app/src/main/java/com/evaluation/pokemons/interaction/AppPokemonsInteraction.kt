@@ -11,7 +11,7 @@ import io.reactivex.processors.BehaviorProcessor
  */
 interface AppPokemonsInteraction {
 
-    fun pokemonList(language: String): Listing<BaseItemView>
+    fun pokemonList(language: String, query: String): Listing<BaseItemView>
 
     fun langList(): BehaviorProcessor<MutableList<LanguageView>>
 

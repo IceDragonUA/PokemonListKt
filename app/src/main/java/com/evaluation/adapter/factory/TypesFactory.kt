@@ -3,10 +3,13 @@ package com.evaluation.adapter.factory
 import android.view.View
 import com.evaluation.adapter.AdapterItemClickListener
 import com.evaluation.adapter.viewholder.BaseViewHolder
+import com.evaluation.adapter.viewholder.item.EmptyItemView
 import com.evaluation.pokemons.adapter.viewholder.item.CardItemView
 import com.evaluation.adapter.viewholder.item.NoItemView
 
 interface TypesFactory {
+
+    fun type(item: EmptyItemView): Int
 
     fun type(item: NoItemView): Int
 

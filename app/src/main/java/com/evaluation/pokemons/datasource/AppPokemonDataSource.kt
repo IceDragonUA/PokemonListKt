@@ -9,6 +9,7 @@ import com.evaluation.utils.NetworkState
 import com.evaluation.utils.PAGE_OFFSET
 import com.evaluation.utils.PAGE_SIZE
 import com.evaluation.utils.empty
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 
@@ -21,15 +22,21 @@ class AppPokemonDataSource @Inject constructor(
 ) : PageKeyedDataSource<Int, BaseItemView>() {
 
     var language = empty()
+    var query = empty()
     val network = MutableLiveData<Boolean>()
+
+    var disposeInit: Disposable? = null
+    var disposePaged: Disposable? = null
 
     override fun loadInitial(
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, BaseItemView>
     ) {
-        repository.pokemonListInit(
+        disposeInit?.dispose()
+        disposeInit = repository.pokemonListInit(
             offset = PAGE_OFFSET,
             limit = PAGE_SIZE,
+            query = query,
             language = language,
             onPrepared = {
                 postInitialState(NetworkState.LOADING)
@@ -50,9 +57,11 @@ class AppPokemonDataSource @Inject constructor(
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, BaseItemView>) {
-        repository.pokemonListPaged(
+        disposePaged?.dispose()
+        disposePaged = repository.pokemonListPaged(
             offset = params.key,
             limit = PAGE_SIZE,
+            query = query,
             language = language,
             onPrepared = {
                 postBeforeAfterState(NetworkState.LOADING)
@@ -80,4 +89,6 @@ class AppPokemonDataSource @Inject constructor(
 
     private fun populateNextKey(it: MutableList<BaseItemView>, params: LoadParams<Int>) =
         if (!it.last().next.isNullOrEmpty()) params.key + PAGE_SIZE else null
+
+
 }

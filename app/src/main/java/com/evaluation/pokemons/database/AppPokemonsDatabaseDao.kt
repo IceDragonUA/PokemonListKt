@@ -16,8 +16,14 @@ interface AppPokemonsDatabaseDao {
     @Query("SELECT * FROM pokemons ORDER BY `index` ASC")
     fun pokemonList(): List<PokemonTableView>
 
+    @Query("SELECT * FROM pokemons WHERE name LIKE '%' || :filter || '%' ORDER BY `index` ASC ")
+    fun pokemonList(filter: String): List<PokemonTableView>
+
     @Query("SELECT * FROM pokemons ORDER BY `index` ASC LIMIT :limit OFFSET :offset ")
     fun pokemonPagedList(limit: Int, offset: Int): List<PokemonTableView>
+
+    @Query("SELECT * FROM pokemons WHERE name LIKE '%' || :filter || '%' ORDER BY `index` ASC LIMIT :limit OFFSET :offset ")
+    fun pokemonPagedList(limit: Int, offset: Int, filter: String): List<PokemonTableView>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLanguageList(items: List<LanguageTableItem>)

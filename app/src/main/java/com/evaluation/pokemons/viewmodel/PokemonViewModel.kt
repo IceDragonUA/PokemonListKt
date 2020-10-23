@@ -3,6 +3,7 @@ package com.evaluation.pokemons.viewmodel
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
 import androidx.lifecycle.ViewModel
@@ -19,7 +20,7 @@ class PokemonViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
     private var _langResult: LiveData<MutableList<LanguageView>>? = null
-    private val langResult: LiveData<MutableList<LanguageView>>
+    val langResult: LiveData<MutableList<LanguageView>>
         get() {
             if (_langResult == null) {
                 _langResult = LiveDataReactiveStreams.fromPublisher(interaction.langList())
@@ -27,8 +28,13 @@ class PokemonViewModel @ViewModelInject constructor(
             return _langResult ?: throw AssertionError("Set to null by another thread")
         }
 
-    private val itemResult = map(langResult) { interaction.pokemonList("en") }
+    val queryResult = MutableLiveData<Pair<String, String>>()
+    private val itemResult = map(queryResult) { interaction.pokemonList(it.second, it.first) }
     val items = switchMap(itemResult) { it.pagedList }
     val networkState = switchMap(itemResult) { it.networkState }
+
+    fun search(query: Pair<String, String>) {
+        this.queryResult.value = query
+    }
 
 }

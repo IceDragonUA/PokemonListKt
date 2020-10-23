@@ -60,6 +60,7 @@ dependencies {
 
     implementation dep.lifeCycleViewModel
     implementation dep.lifeCycleLiveData
+    implementation dep.lifeCycleReactive
     implementation dep.lifeCycleCommon
     implementation dep.lifeCycleExtansions
     implementation dep.legacySupport

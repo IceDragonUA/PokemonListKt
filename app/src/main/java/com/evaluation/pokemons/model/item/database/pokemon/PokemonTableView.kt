@@ -1,4 +1,4 @@
-package com.evaluation.pokemons.model.item.database
+package com.evaluation.pokemons.model.item.database.pokemon
 
 import androidx.room.Relation
 

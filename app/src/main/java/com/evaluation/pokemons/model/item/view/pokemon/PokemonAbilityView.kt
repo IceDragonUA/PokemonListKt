@@ -1,4 +1,4 @@
-package com.evaluation.pokemons.model.item.view
+package com.evaluation.pokemons.model.item.view.pokemon
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

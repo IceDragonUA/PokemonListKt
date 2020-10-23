@@ -26,7 +26,7 @@
             app:argType="string" />
         <argument
             android:name="item"
-            app:argType="com.evaluation.pokemons.model.item.view.PokemonView" />
+            app:argType="com.evaluation.pokemons.model.item.view.pokemon.PokemonView" />
     </fragment>
 
 </navigation>

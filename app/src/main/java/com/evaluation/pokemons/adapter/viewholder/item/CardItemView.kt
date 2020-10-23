@@ -2,9 +2,7 @@ package com.evaluation.pokemons.adapter.viewholder.item
 
 import com.evaluation.adapter.factory.TypesFactory
 import com.evaluation.adapter.viewholder.item.BaseItemView
-import com.evaluation.pokemons.model.item.database.PokemonTableItem
-import com.evaluation.pokemons.model.item.database.PokemonTableView
-import com.evaluation.pokemons.model.item.view.PokemonView
+import com.evaluation.pokemons.model.item.view.pokemon.PokemonView
 
 /**
  * @author Vladyslav Havrylenko

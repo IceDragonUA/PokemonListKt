@@ -2,6 +2,7 @@ package com.evaluation.pokemons.network
 
 import com.evaluation.executor.ThreadExecutor
 import com.evaluation.network.RestApi
+import com.evaluation.pokemons.model.item.rest.language.LanguageList
 import com.evaluation.pokemons.model.item.rest.language.LanguageResult
 import com.evaluation.pokemons.model.item.rest.pokemon.Pokemon
 import com.evaluation.pokemons.model.item.rest.pokemon.PokemonList
@@ -39,7 +40,7 @@ class AppPokemonsRestApiDaoImpl @Inject constructor(
                     args.forEach { arg ->
                         it.pokemons.forEach { pokemon ->
                             pokemon.stats.forEach { stat ->
-                                stat.langStat = arg as LanguageResult
+                                if (stat.stat.name == (arg as LanguageResult).name) stat.langStat = arg
                             }
                         }
                     }
@@ -57,7 +58,7 @@ class AppPokemonsRestApiDaoImpl @Inject constructor(
                     args.forEach { arg ->
                         it.pokemons.forEach { pokemon ->
                             pokemon.abilities.forEach { ability ->
-                                ability.langAbility = arg as LanguageResult
+                                if (ability.ability.name == (arg as LanguageResult).name) ability.langAbility = arg
                             }
                         }
                     }
@@ -75,13 +76,19 @@ class AppPokemonsRestApiDaoImpl @Inject constructor(
                     args.forEach { arg ->
                         it.pokemons.forEach { pokemon ->
                             pokemon.types.forEach { type ->
-                                type.langType = arg as LanguageResult
+                                if (type.type.name == (arg as LanguageResult).name) type.langType = arg
                             }
                         }
                     }
                     it
                 }
             }
+            .subscribeOn(executor.mainExecutor)
+            .observeOn(executor.postExecutor)
+    }
+
+    override fun languageList(offset: Int, limit: Int): Single<LanguageList> {
+        return appRest.languageList(offset, limit)
             .subscribeOn(executor.mainExecutor)
             .observeOn(executor.postExecutor)
     }

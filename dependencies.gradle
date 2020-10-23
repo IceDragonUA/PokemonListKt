@@ -20,6 +20,7 @@ ext {
 
             lifeCycleViewModel       : 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0',
             lifeCycleLiveData        : 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0',
+            lifeCycleReactive        : 'androidx.lifecycle:lifecycle-reactivestreams:2.2.0',
             lifeCycleCommon          : 'androidx.lifecycle:lifecycle-common-java8:2.2.0',
             lifeCycleExtansions      : 'androidx.lifecycle:lifecycle-extensions:2.2.0',
             legacySupport            : 'androidx.legacy:legacy-support-v4:1.0.0',

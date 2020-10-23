@@ -1,7 +1,9 @@
 package com.evaluation.pokemons.interaction
 
 import com.evaluation.adapter.viewholder.item.BaseItemView
+import com.evaluation.pokemons.model.item.view.language.LanguageView
 import com.evaluation.utils.Listing
+import io.reactivex.processors.BehaviorProcessor
 
 /**
  * @author Vladyslav Havrylenko
@@ -9,6 +11,8 @@ import com.evaluation.utils.Listing
  */
 interface AppPokemonsInteraction {
 
-    fun pokemonList(): Listing<BaseItemView>
+    fun pokemonList(language: String): Listing<BaseItemView>
+
+    fun langList(): BehaviorProcessor<MutableList<LanguageView>>
 
 }

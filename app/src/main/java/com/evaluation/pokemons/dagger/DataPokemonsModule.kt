@@ -48,7 +48,7 @@ object DataPokemonsModule {
 
     @Singleton
     @Provides
-    fun appInteraction(factory: AppPokemonDataSourceFactory, config: PagedList.Config, networkExecutor: Executor): AppPokemonsInteraction =
-        AppPokemonsInteractionImpl(factory, config, networkExecutor)
+    fun appInteraction(factory: AppPokemonDataSourceFactory, config: PagedList.Config, networkExecutor: Executor, repository: AppPokemonsRepository): AppPokemonsInteraction =
+        AppPokemonsInteractionImpl(factory, config, networkExecutor, repository)
 
 }

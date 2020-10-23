@@ -2,6 +2,7 @@ package com.evaluation.utils
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
+import com.evaluation.pokemons.model.item.view.language.LanguageView
 
 /**
  * Data class that is necessary for a UI to show a listing and interact w/ the rest of the system

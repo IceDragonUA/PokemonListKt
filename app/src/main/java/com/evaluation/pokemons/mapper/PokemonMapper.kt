@@ -1,14 +1,16 @@
 package com.evaluation.pokemons.mapper
 
-import com.evaluation.pokemons.model.item.database.*
+import com.evaluation.pokemons.model.ResponseResult
+import com.evaluation.pokemons.model.item.database.language.LanguageTableItem
+import com.evaluation.pokemons.model.item.database.pokemon.*
 import com.evaluation.pokemons.model.item.rest.pokemon.Pokemon
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Ability
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Stat
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Type
-import com.evaluation.pokemons.model.item.view.PokemonAbilityView
-import com.evaluation.pokemons.model.item.view.PokemonStatView
-import com.evaluation.pokemons.model.item.view.PokemonTypeView
-import com.evaluation.pokemons.model.item.view.PokemonView
+import com.evaluation.pokemons.model.item.view.pokemon.PokemonAbilityView
+import com.evaluation.pokemons.model.item.view.pokemon.PokemonStatView
+import com.evaluation.pokemons.model.item.view.pokemon.PokemonTypeView
+import com.evaluation.pokemons.model.item.view.pokemon.PokemonView
 import com.evaluation.utils.defIfNull
 import javax.inject.Inject
 
@@ -39,24 +41,30 @@ class PokemonMapper @Inject constructor() {
         }
     }
 
-    fun toTableItem(item: Stat, index: Int): PokemonStatTableItem {
+    fun toTableItem(item: Stat, index: Int, language: String): PokemonStatTableItem {
         return PokemonStatTableItem(
             index = index,
-            name = item.langStat.names[0].name.defIfNull()
+            name = item.langStat.names.find { it.language.name == language }?.name.defIfNull()
         )
     }
 
-    fun toTableItem(item: Ability, index: Int): PokemonAbilityTableItem {
+    fun toTableItem(item: Ability, index: Int, language: String): PokemonAbilityTableItem {
         return PokemonAbilityTableItem(
             index = index,
-            name = item.langAbility.names[0].name.defIfNull()
+            name = item.langAbility.names.find { it.language.name == language }?.name.defIfNull()
         )
     }
 
-    fun toTableItem(item: Type, index: Int): PokemonTypeTableItem {
+    fun toTableItem(item: Type, index: Int, language: String): PokemonTypeTableItem {
         return PokemonTypeTableItem(
             index = index,
-            name = item.langType.names[0].name.defIfNull()
+            name = item.langType.names.find { it.language.name == language }?.name.defIfNull()
+        )
+    }
+
+    fun toTableItem(item: ResponseResult): LanguageTableItem {
+        return LanguageTableItem(
+            name = item.name.defIfNull()
         )
     }
 

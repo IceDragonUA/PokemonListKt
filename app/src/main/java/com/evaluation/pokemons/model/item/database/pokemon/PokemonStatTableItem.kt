@@ -1,11 +1,6 @@
-package com.evaluation.pokemons.model.item.database
+package com.evaluation.pokemons.model.item.database.pokemon
 
 import androidx.room.*
-import com.evaluation.pokemons.model.item.rest.pokemon.Sprite
-import com.evaluation.pokemons.model.item.rest.pokemon.stats.Ability
-import com.evaluation.pokemons.model.item.rest.pokemon.stats.Stat
-import com.evaluation.pokemons.model.item.rest.pokemon.stats.Type
-import com.google.gson.annotations.SerializedName
 
 /**
  * @author Vladyslav Havrylenko

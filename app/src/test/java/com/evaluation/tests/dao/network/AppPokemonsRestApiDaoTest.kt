@@ -19,9 +19,9 @@ import org.mockito.MockitoAnnotations
  * @author Vladyslav Havrylenko
  * @since 11.10.2020
  */
-class AppProgramsRestApiDaoTest {
+class AppPokemonsRestApiDaoTest {
 
-    private lateinit var appProgramsRestApiDao: AppPokemonsRestApiDao
+    private lateinit var appPokemonsRestApiDao: AppPokemonsRestApiDao
 
     private var appRest: RestApi = RetrofitMocks.appRest
 
@@ -31,7 +31,7 @@ class AppProgramsRestApiDaoTest {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        appProgramsRestApiDao = AppPokemonsRestApiDaoImpl(appRest, executor)
+        appPokemonsRestApiDao = AppPokemonsRestApiDaoImpl(appRest, executor)
         whenever(executor.mainExecutor).thenReturn(Schedulers.trampoline())
         whenever(executor.postExecutor).thenReturn(Schedulers.trampoline())
     }
@@ -40,9 +40,9 @@ class AppProgramsRestApiDaoTest {
     fun `should do call`() {
         assertNotNull(appRest)
         assertNotNull(executor)
-        assertNotNull(appProgramsRestApiDao)
+        assertNotNull(appPokemonsRestApiDao)
 
-        appProgramsRestApiDao.pokemonList(0, 0).test {
+        appPokemonsRestApiDao.pokemonList(0, 0).test {
             assertValueCount(1)
             assertNoErrors()
             assertComplete()

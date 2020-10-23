@@ -8,6 +8,7 @@ import com.evaluation.pokemons.repository.AppPokemonsRepository
 import com.evaluation.utils.NetworkState
 import com.evaluation.utils.PAGE_OFFSET
 import com.evaluation.utils.PAGE_SIZE
+import com.evaluation.utils.empty
 import javax.inject.Inject
 
 
@@ -19,6 +20,7 @@ class AppPokemonDataSource @Inject constructor(
     private val repository: AppPokemonsRepository
 ) : PageKeyedDataSource<Int, BaseItemView>() {
 
+    var language = empty()
     val network = MutableLiveData<Boolean>()
 
     override fun loadInitial(
@@ -28,6 +30,7 @@ class AppPokemonDataSource @Inject constructor(
         repository.pokemonListInit(
             offset = PAGE_OFFSET,
             limit = PAGE_SIZE,
+            language = language,
             onPrepared = {
                 postInitialState(NetworkState.LOADING)
             },
@@ -47,9 +50,10 @@ class AppPokemonDataSource @Inject constructor(
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, BaseItemView>) {
-        repository.programListPaged(
+        repository.pokemonListPaged(
             offset = params.key,
             limit = PAGE_SIZE,
+            language = language,
             onPrepared = {
                 postBeforeAfterState(NetworkState.LOADING)
             },

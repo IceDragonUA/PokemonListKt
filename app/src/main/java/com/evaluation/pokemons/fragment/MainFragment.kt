@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.evaluation.BaseFragment
 import com.evaluation.R
 import com.evaluation.adapter.AdapterItemClickListener
 import com.evaluation.adapter.viewholder.item.BaseItemView
@@ -26,11 +26,13 @@ import kotlinx.coroutines.*
  * @since 09.03.2020
  */
 @AndroidEntryPoint
-class MainFragment : Fragment(), AdapterItemClickListener<BaseItemView>, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
+class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
 
     private var binding: MainLayoutBinding by autoCleared()
 
     private val viewModel: PokemonViewModel by viewModels()
+
+    private var language: String = empty()
 
     private var queryTextChangedJob: Job? = null
 
@@ -114,7 +116,7 @@ class MainFragment : Fragment(), AdapterItemClickListener<BaseItemView>, SearchV
     }
 
     override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-        viewModel.search(Pair(empty(), "en"))
+        viewModel.search(Pair(empty(), language))
         isIconified = true
         return true
     }
@@ -142,10 +144,19 @@ class MainFragment : Fragment(), AdapterItemClickListener<BaseItemView>, SearchV
     }
 
     private fun initLoader() {
-        viewModel.langResult.observe(viewLifecycleOwner) {
-            if (viewModel.queryResult.value == null) viewModel.queryResult.value = Pair(empty(), "en")
-        }
         viewModel.items.observe(viewLifecycleOwner, binding.listView.adapter::submitList)
+    }
+
+    override fun languageLoaded(language: String) {
+        this.language = language
+        viewModel.search(Pair(empty(), language))
+    }
+
+    override fun languageSwitched(language: String) {
+        this.language = language
+        lastSearchQuery?.let {
+            viewModel.search(Pair(it, language))
+        } ?: viewModel.search(Pair(empty(), language))
     }
 
     override fun onClicked(item: BaseItemView) {

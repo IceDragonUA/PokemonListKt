@@ -28,11 +28,9 @@ class AppPokemonDataSource @Inject constructor(
     var disposeInit: Disposable? = null
     var disposePaged: Disposable? = null
 
-    override fun loadInitial(
-        params: LoadInitialParams<Int>,
-        callback: LoadInitialCallback<Int, BaseItemView>
-    ) {
+    override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, BaseItemView>) {
         disposeInit?.dispose()
+        disposePaged?.dispose()
         disposeInit = repository.pokemonListInit(
             offset = PAGE_OFFSET,
             limit = PAGE_SIZE,
@@ -57,6 +55,7 @@ class AppPokemonDataSource @Inject constructor(
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, BaseItemView>) {
+        disposeInit?.dispose()
         disposePaged?.dispose()
         disposePaged = repository.pokemonListPaged(
             offset = params.key,

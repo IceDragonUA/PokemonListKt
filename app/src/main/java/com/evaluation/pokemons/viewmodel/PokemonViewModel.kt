@@ -19,16 +19,7 @@ class PokemonViewModel @ViewModelInject constructor(
     private val interaction: AppPokemonsInteraction
 ) : ViewModel() {
 
-    private var _langResult: LiveData<MutableList<LanguageView>>? = null
-    val langResult: LiveData<MutableList<LanguageView>>
-        get() {
-            if (_langResult == null) {
-                _langResult = LiveDataReactiveStreams.fromPublisher(interaction.langList())
-            }
-            return _langResult ?: throw AssertionError("Set to null by another thread")
-        }
-
-    val queryResult = MutableLiveData<Pair<String, String>>()
+    private val queryResult = MutableLiveData<Pair<String, String>>()
     private val itemResult = map(queryResult) { interaction.pokemonList(it.second, it.first) }
     val items = switchMap(itemResult) { it.pagedList }
     val networkState = switchMap(itemResult) { it.networkState }

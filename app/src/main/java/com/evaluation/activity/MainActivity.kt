@@ -14,6 +14,8 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import com.evaluation.BaseFragment
 import com.evaluation.R
+import com.evaluation.utils.LANGUAGE
+import com.evaluation.utils.empty
 import com.evaluation.viewmodel.LanguageViewModel
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,6 +24,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    var language: String = empty()
+
+    private var lastLanguage : String? = null
 
     private val viewModel: LanguageViewModel by viewModels()
 
@@ -38,6 +44,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolBar)
         setupWithNavController(toolBar, navController, drawer)
+        restoreInstance(savedInstanceState)
+    }
+
+    private fun restoreInstance(savedInstanceState: Bundle?) {
+        val language = savedInstanceState?.getString(LANGUAGE)
+        if (language != null) {
+            lastLanguage = language
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        lastLanguage = language
+        if (lastLanguage != null) {
+            outState.putString(LANGUAGE, lastLanguage)
+        }
+        super.onSaveInstanceState(outState)
     }
 
     override fun onAttachFragment(fragment: Fragment) {
@@ -64,23 +86,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initLoader() {
         viewModel.langResult.observe(this) { languages ->
+            language = if (lastLanguage != null) lastLanguage as String else languages.first().name
             val drawerMenu: Menu = navigation.menu
             languages.forEach {
                 drawerMenu.add(it.name)
             }
             navigation.setNavigationItemSelectedListener(this)
-            fragment().languageLoaded(languages.first().name)
+            if (lastLanguage != language) fragment()?.languageLoaded(language)
+            lastLanguage = language
         }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        fragment().languageSwitched(item.title.toString())
+        language = item.title.toString()
+        if (lastLanguage != language) fragment()?.languageSwitched(language)
+        lastLanguage = language
         drawer.closeDrawers()
         return true
     }
 
-    private fun fragment(): BaseFragment {
+    private fun fragment(): BaseFragment? {
         val fragments = navHostFragment.childFragmentManager.fragments
-        return fragments.find { it is BaseFragment && it.isVisible } as BaseFragment
+        return fragments.find { it is BaseFragment && it.isVisible } as? BaseFragment
     }
 }

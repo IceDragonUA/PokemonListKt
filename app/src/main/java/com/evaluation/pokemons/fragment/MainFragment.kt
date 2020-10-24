@@ -1,5 +1,6 @@
 package com.evaluation.pokemons.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -8,15 +9,13 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.evaluation.BaseFragment
 import com.evaluation.R
+import com.evaluation.activity.MainActivity
 import com.evaluation.adapter.AdapterItemClickListener
 import com.evaluation.adapter.viewholder.item.BaseItemView
 import com.evaluation.databinding.MainLayoutBinding
 import com.evaluation.pokemons.adapter.viewholder.item.CardItemView
 import com.evaluation.pokemons.viewmodel.PokemonViewModel
-import com.evaluation.utils.ICONIFIED
-import com.evaluation.utils.QUERY
-import com.evaluation.utils.autoCleared
-import com.evaluation.utils.empty
+import com.evaluation.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
@@ -40,6 +39,21 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
 
     private var isIconified: Boolean = true
 
+    private var lastLanguage : String? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        lastLanguage = (activity as MainActivity).language
+    }
+
+    override fun onResume() {
+        super.onResume()
+        language = (activity as MainActivity).language
+        if (lastLanguage != language) {
+            languageSwitched(language)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
@@ -55,9 +69,17 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
         if (iconified != null) {
             isIconified = iconified
         }
+        val language = savedInstanceState?.getString(LANGUAGE)
+        if (language != null) {
+            lastLanguage = language
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        lastLanguage = language
+        if (lastLanguage != null) {
+            outState.putString(LANGUAGE, lastLanguage)
+        }
         if (lastSearchQuery != null) {
             outState.putString(QUERY, lastSearchQuery)
         }
@@ -130,7 +152,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
                 delay(500)
                 if (!query.isNullOrEmpty()) {
                     if (lastSearchQuery != query) {
-                        viewModel.search(Pair(query, "en"))
+                        viewModel.search(Pair(query, language))
                     }
                 }
                 lastSearchQuery = query
@@ -161,12 +183,15 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
 
     override fun onClicked(item: BaseItemView) {
         when (item) {
-            is CardItemView -> findNavController().navigate(
-                MainFragmentDirections.actionMainFragmentToDetailFragment(
-                    item.viewItem.name,
-                    item.viewItem
+            is CardItemView -> {
+                lastLanguage = language
+                findNavController().navigate(
+                    MainFragmentDirections.actionMainFragmentToDetailFragment(
+                        item.viewItem.name,
+                        item.viewItem
+                    )
                 )
-            )
+            }
         }
     }
 

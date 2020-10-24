@@ -3,22 +3,27 @@ package com.evaluation.pokemons.mapper
 import com.evaluation.pokemons.model.ResponseResult
 import com.evaluation.pokemons.model.item.database.language.LanguageTableItem
 import com.evaluation.pokemons.model.item.database.pokemon.*
+import com.evaluation.pokemons.model.item.rest.language.Language
+import com.evaluation.pokemons.model.item.rest.language.LanguageName
+import com.evaluation.pokemons.model.item.rest.language.LanguageResult
 import com.evaluation.pokemons.model.item.rest.pokemon.Pokemon
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Ability
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Stat
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Type
-import com.evaluation.pokemons.model.item.view.pokemon.PokemonAbilityView
-import com.evaluation.pokemons.model.item.view.pokemon.PokemonStatView
-import com.evaluation.pokemons.model.item.view.pokemon.PokemonTypeView
-import com.evaluation.pokemons.model.item.view.pokemon.PokemonView
+import com.evaluation.pokemons.model.item.view.language.LanguageView
+import com.evaluation.pokemons.model.item.view.pokemon.*
 import com.evaluation.utils.defIfNull
+import com.evaluation.utils.fromJson
+import com.evaluation.utils.toTypedJson
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import javax.inject.Inject
 
 /**
  * @author Vladyslav Havrylenko
  * @since 01.10.2020
  */
-class PokemonMapper @Inject constructor() {
+class PokemonMapper @Inject constructor(private val gson: Gson) {
 
     data class Converter(
         val item: PokemonTableItem,
@@ -41,24 +46,24 @@ class PokemonMapper @Inject constructor() {
         }
     }
 
-    fun toTableItem(item: Stat, index: Int, language: String): PokemonStatTableItem {
+    fun toTableItem(item: Stat, index: Int): PokemonStatTableItem {
         return PokemonStatTableItem(
             index = index,
-            name = item.langStat.names.find { it.language.name == language }?.name.defIfNull()
+            name = gson.toTypedJson(item.langStat, object : TypeToken<LanguageResult>() {}.type)
         )
     }
 
-    fun toTableItem(item: Ability, index: Int, language: String): PokemonAbilityTableItem {
+    fun toTableItem(item: Ability, index: Int): PokemonAbilityTableItem {
         return PokemonAbilityTableItem(
             index = index,
-            name = item.langAbility.names.find { it.language.name == language }?.name.defIfNull()
+            name = gson.toTypedJson(item.langAbility, object : TypeToken<LanguageResult>() {}.type)
         )
     }
 
-    fun toTableItem(item: Type, index: Int, language: String): PokemonTypeTableItem {
+    fun toTableItem(item: Type, index: Int): PokemonTypeTableItem {
         return PokemonTypeTableItem(
             index = index,
-            name = item.langType.names.find { it.language.name == language }?.name.defIfNull()
+            name = gson.toTypedJson(item.langType, object : TypeToken<LanguageResult>() {}.type)
         )
     }
 
@@ -84,18 +89,31 @@ class PokemonMapper @Inject constructor() {
 
     private fun toViewItem(item: PokemonStatTableItem): PokemonStatView {
         return PokemonStatView(
-            name = item.name.defIfNull()
+            names = (gson.fromJson(item.name) as LanguageResult).names.map { this.toViewItem(it) }
         )
     }
 
     private fun toViewItem(item: PokemonAbilityTableItem): PokemonAbilityView {
         return PokemonAbilityView(
-            name = item.name.defIfNull()
+            names = (gson.fromJson(item.name) as LanguageResult).names.map { this.toViewItem(it) }
         )
     }
 
     private fun toViewItem(item: PokemonTypeTableItem): PokemonTypeView {
         return PokemonTypeView(
+            names = (gson.fromJson(item.name) as LanguageResult).names.map { this.toViewItem(it) }
+        )
+    }
+
+    private fun toViewItem(item: LanguageName): LanguageNameView {
+        return LanguageNameView(
+            name = item.name.defIfNull(),
+            language = this.toViewItem(item.language)
+        )
+    }
+
+    private fun toViewItem(item: Language): LanguageView {
+        return LanguageView(
             name = item.name.defIfNull()
         )
     }

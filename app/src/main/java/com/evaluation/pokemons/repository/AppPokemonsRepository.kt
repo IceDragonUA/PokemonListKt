@@ -33,7 +33,6 @@ class AppPokemonsRepository @Inject constructor(
         offset: Int,
         limit: Int,
         query: String,
-        language: String,
         onPrepared: () -> Unit,
         onSuccess: (MutableList<BaseItemView>) -> Unit,
         onError: (MutableList<BaseItemView>) -> Unit
@@ -53,13 +52,13 @@ class AppPokemonsRepository @Inject constructor(
                         val index = offset + rawIndex + 1
                         val tableItem = mapper.toTableItem(pokemon, index)
                         val stats = pokemon.stats.map {
-                            mapper.toTableItem(it, index, language)
+                            mapper.toTableItem(it, index)
                         }
                         val abilities = pokemon.abilities.map {
-                            mapper.toTableItem(it, index, language)
+                            mapper.toTableItem(it, index)
                         }
                         val types = pokemon.types.map {
-                            mapper.toTableItem(it, index, language)
+                            mapper.toTableItem(it, index)
                         }
                         mapper.bufferedEntity(tableItem, stats, abilities, types)
                     }
@@ -128,7 +127,6 @@ class AppPokemonsRepository @Inject constructor(
         offset: Int,
         limit: Int,
         query: String,
-        language: String,
         onPrepared: () -> Unit,
         onSuccess: (MutableList<BaseItemView>) -> Unit,
         onError: () -> Unit
@@ -143,13 +141,13 @@ class AppPokemonsRepository @Inject constructor(
                         val index = offset + rawIndex + 1
                         val tableItem = mapper.toTableItem(pokemon, index)
                         val stats = pokemon.stats.map {
-                            mapper.toTableItem(it, index, language)
+                            mapper.toTableItem(it, index)
                         }
                         val abilities = pokemon.abilities.map {
-                            mapper.toTableItem(it, index, language)
+                            mapper.toTableItem(it, index)
                         }
                         val types = pokemon.types.map {
-                            mapper.toTableItem(it, index, language)
+                            mapper.toTableItem(it, index)
                         }
                         mapper.bufferedEntity(tableItem, stats, abilities, types)
                     }

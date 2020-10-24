@@ -21,7 +21,6 @@ class AppPokemonDataSource @Inject constructor(
     private val repository: AppPokemonsRepository
 ) : PageKeyedDataSource<Int, BaseItemView>() {
 
-    var language = empty()
     var query = empty()
     val network = MutableLiveData<Boolean>()
 
@@ -35,7 +34,6 @@ class AppPokemonDataSource @Inject constructor(
             offset = PAGE_OFFSET,
             limit = PAGE_SIZE,
             query = query,
-            language = language,
             onPrepared = {
                 postInitialState(NetworkState.LOADING)
             },
@@ -61,7 +59,6 @@ class AppPokemonDataSource @Inject constructor(
             offset = params.key,
             limit = PAGE_SIZE,
             query = query,
-            language = language,
             onPrepared = {
                 postBeforeAfterState(NetworkState.LOADING)
             },

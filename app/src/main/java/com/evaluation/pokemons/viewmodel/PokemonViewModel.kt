@@ -19,12 +19,12 @@ class PokemonViewModel @ViewModelInject constructor(
     private val interaction: AppPokemonsInteraction
 ) : ViewModel() {
 
-    private val queryResult = MutableLiveData<Pair<String, String>>()
-    private val itemResult = map(queryResult) { interaction.pokemonList(it.second, it.first) }
+    private val queryResult = MutableLiveData<String>()
+    private val itemResult = map(queryResult) { interaction.pokemonList(it) }
     val items = switchMap(itemResult) { it.pagedList }
     val networkState = switchMap(itemResult) { it.networkState }
 
-    fun search(query: Pair<String, String>) {
+    fun search(query: String) {
         this.queryResult.value = query
     }
 

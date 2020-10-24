@@ -77,21 +77,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
-        } else {
-            return super.onBackPressed()
+        when {
+            drawer.isDrawerOpen(GravityCompat.START) -> {
+                drawer.closeDrawer(GravityCompat.START)
+            }
+            drawer.isDrawerOpen(GravityCompat.END) -> {
+                drawer.closeDrawer(GravityCompat.END)
+            }
+            else -> {
+                return super.onBackPressed()
+            }
         }
     }
 
     private fun initLoader() {
         viewModel.langResult.observe(this) { languages ->
             language = if (lastLanguage != null) lastLanguage as String else languages.first().name
-            val drawerMenu: Menu = navigation.menu
+            val drawerMenu: Menu = navLanguage.menu
             languages.forEach {
                 drawerMenu.add(it.name)
             }
-            navigation.setNavigationItemSelectedListener(this)
+            navLanguage.setNavigationItemSelectedListener(this)
             if (lastLanguage != language) fragment()?.languageLoaded(language)
             lastLanguage = language
         }

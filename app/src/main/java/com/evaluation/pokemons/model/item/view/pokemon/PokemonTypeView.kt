@@ -15,5 +15,5 @@ import kotlinx.android.parcel.Parcelize
  */
 @Parcelize
 data class PokemonTypeView(
-    val name: String,
+    val names: List<LanguageNameView>,
 ) : Parcelable

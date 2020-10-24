@@ -1,13 +1,11 @@
 package com.evaluation.pokemons.model.item.view.pokemon
 
 import android.os.Parcelable
+import com.evaluation.pokemons.model.item.view.language.LanguageView
 import kotlinx.android.parcel.Parcelize
 
-/**
- * @author Vladyslav Havrylenko
- * @since 07.10.2020
- */
 @Parcelize
-data class PokemonAbilityView(
-    val names: List<LanguageNameView>,
+data class LanguageNameView(
+    val name: String,
+    val language: LanguageView
 ) : Parcelable

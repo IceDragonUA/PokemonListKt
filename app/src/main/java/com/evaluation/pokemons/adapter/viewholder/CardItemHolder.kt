@@ -20,9 +20,9 @@ class CardItemHolder(itemView: View, listener: AdapterItemClickListener<CardItem
         val abilities = item.viewItem.abilities
             .filter { it.names.find { name -> name.language.name == language }?.name != null  }
             .map { it.names.find { name -> name.language.name == language } }
-        if (abilities.isNotEmpty()) {
-            itemView.abilities.initText(abilities.joinToString { it?.name ?: empty() })
-        }
+        if (abilities.isNotEmpty())
+            itemView.abilities.initText(abilities.joinToString { it?.name ?: empty() }) else
+            itemView.abilities.initText(empty())
 
         itemView.setOnClickListener {
             listener?.onClicked(item)

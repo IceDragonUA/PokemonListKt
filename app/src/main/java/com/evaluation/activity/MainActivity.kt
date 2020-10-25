@@ -12,7 +12,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.onNavDestinationSelected
-import com.evaluation.BaseFragment
+import com.evaluation.fragment.BaseFragment
 import com.evaluation.R
 import com.evaluation.utils.LANGUAGE
 import com.evaluation.utils.empty

@@ -16,4 +16,6 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class PokemonTypeView(
     val names: List<LanguageNameView>,
-) : Parcelable
+) : Parcelable, PokemonInfo{
+    override fun names(): List<LanguageNameView> = names
+}

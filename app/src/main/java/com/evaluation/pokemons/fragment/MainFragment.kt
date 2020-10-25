@@ -6,7 +6,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.evaluation.BaseFragment
+import com.evaluation.fragment.BaseFragment
 import com.evaluation.R
 import com.evaluation.activity.MainActivity
 import com.evaluation.adapter.AdapterItemClickListener
@@ -40,8 +40,6 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     private var lastSearchQuery: String? = null
 
     private var isIconified: Boolean = true
-
-    private var lastLanguage : String? = null
 
     override fun onResume() {
         super.onResume()
@@ -94,7 +92,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu, menu)
-        super.onCreateOptionsMenu(menu, inflater);
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -173,6 +171,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
                 findNavController().navigate(
                     MainFragmentDirections.actionMainFragmentToDetailFragment(
                         item.viewItem.name,
+                        language,
                         item.viewItem
                     )
                 )

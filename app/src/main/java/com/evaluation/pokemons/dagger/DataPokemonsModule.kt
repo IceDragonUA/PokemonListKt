@@ -6,6 +6,8 @@ import com.evaluation.database.AppDatabase
 import com.evaluation.executor.BaseExecutor
 import com.evaluation.network.RestApi
 import com.evaluation.pokemons.database.AppPokemonsDatabaseDao
+import com.evaluation.pokemons.datasource.AppCategoryDataSource
+import com.evaluation.pokemons.datasource.AppCategoryDataSourceFactory
 import com.evaluation.pokemons.datasource.AppPokemonDataSource
 import com.evaluation.pokemons.datasource.AppPokemonDataSourceFactory
 import com.evaluation.pokemons.interaction.AppPokemonsInteraction
@@ -40,15 +42,23 @@ object DataPokemonsModule {
 
     @Singleton
     @Provides
-    fun appDataSource(appRepository: AppPokemonsRepository) = AppPokemonDataSource(appRepository)
+    fun appPokemonDataSource(appRepository: AppPokemonsRepository) = AppPokemonDataSource(appRepository)
 
     @Singleton
     @Provides
-    fun appDataSourceFactory(appDataSource: AppPokemonDataSource) = AppPokemonDataSourceFactory(appDataSource)
+    fun appPokemonDataSourceFactory(appDataSource: AppPokemonDataSource) = AppPokemonDataSourceFactory(appDataSource)
 
     @Singleton
     @Provides
-    fun appInteraction(factory: AppPokemonDataSourceFactory, config: PagedList.Config, networkExecutor: Executor, repository: AppPokemonsRepository): AppPokemonsInteraction =
-        AppPokemonsInteractionImpl(factory, config, networkExecutor, repository)
+    fun appCategoryDataSource() = AppCategoryDataSource()
+
+    @Singleton
+    @Provides
+    fun appCategoryDataSourceFactory(appDataSource: AppCategoryDataSource) = AppCategoryDataSourceFactory(appDataSource)
+
+    @Singleton
+    @Provides
+    fun appInteraction(pokemonFactory: AppPokemonDataSourceFactory, categoryFactory: AppCategoryDataSourceFactory, config: PagedList.Config, networkExecutor: Executor, repository: AppPokemonsRepository): AppPokemonsInteraction =
+        AppPokemonsInteractionImpl(pokemonFactory, categoryFactory, config, networkExecutor, repository)
 
 }

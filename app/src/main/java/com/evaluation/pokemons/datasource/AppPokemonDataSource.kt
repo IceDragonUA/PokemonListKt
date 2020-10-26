@@ -8,7 +8,7 @@ import com.evaluation.pokemons.repository.AppPokemonsRepository
 import com.evaluation.utils.NetworkState
 import com.evaluation.utils.PAGE_OFFSET
 import com.evaluation.utils.PAGE_SIZE
-import com.evaluation.utils.empty
+import com.evaluation.utils.emptyString
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
@@ -21,7 +21,7 @@ class AppPokemonDataSource @Inject constructor(
     private val repository: AppPokemonsRepository
 ) : PageKeyedDataSource<Int, BaseItemView>() {
 
-    var query = empty()
+    var query = emptyString()
     val network = MutableLiveData<Boolean>()
 
     var disposeInit: Disposable? = null

@@ -1,6 +1,7 @@
 package com.evaluation.pokemons.model.item.rest.types
 
 import com.evaluation.pokemons.model.ResponseResult
+import com.evaluation.pokemons.model.item.rest.pokemon.Pokemon
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -9,5 +10,7 @@ import com.google.gson.annotations.SerializedName
  */
 data class TypePokemon(
     @SerializedName("pokemon")
-    val pokemon: ResponseResult,
+    val responseResult: ResponseResult,
+
+    var pokemonResult: Pokemon
 )

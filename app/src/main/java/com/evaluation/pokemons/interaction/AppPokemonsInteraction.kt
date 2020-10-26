@@ -2,6 +2,7 @@ package com.evaluation.pokemons.interaction
 
 import com.evaluation.adapter.viewholder.item.BaseItemView
 import com.evaluation.pokemons.model.item.view.language.LanguageView
+import com.evaluation.pokemons.model.item.view.types.CategoryView
 import com.evaluation.utils.Listing
 import io.reactivex.processors.BehaviorProcessor
 
@@ -13,6 +14,10 @@ interface AppPokemonsInteraction {
 
     fun pokemonList(query: String): Listing<BaseItemView>
 
+    fun categoryList(query: String, category: CategoryView): Listing<BaseItemView>
+
     fun langList(): BehaviorProcessor<MutableList<LanguageView>>
+
+    fun categoryList(): BehaviorProcessor<MutableList<CategoryView>>
 
 }

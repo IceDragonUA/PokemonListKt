@@ -42,7 +42,7 @@ class AppPokemonsRestApiDaoTest {
         assertNotNull(executor)
         assertNotNull(appPokemonsRestApiDao)
 
-        appPokemonsRestApiDao.pokemonList(0, 0).test {
+        appPokemonsRestApiDao.typeList(0, 0).test {
             assertValueCount(1)
             assertNoErrors()
             assertComplete()

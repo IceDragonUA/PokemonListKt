@@ -6,6 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.evaluation.pokemons.model.item.database.language.LanguageTableItem
 import com.evaluation.pokemons.model.item.database.pokemon.*
+import com.evaluation.pokemons.model.item.database.types.CategoryPokemonTableItem
+import com.evaluation.pokemons.model.item.database.types.CategoryTableItem
+import com.evaluation.pokemons.model.item.database.types.CategoryTableView
 
 @Dao
 interface AppPokemonsDatabaseDao {
@@ -25,6 +28,9 @@ interface AppPokemonsDatabaseDao {
     @Query("SELECT * FROM pokemons WHERE name LIKE '%' || :filter || '%' ORDER BY `index` ASC LIMIT :limit OFFSET :offset ")
     fun pokemonPagedList(limit: Int, offset: Int, filter: String): List<PokemonTableView>
 
+    @Query("SELECT * FROM categories ORDER BY `index` ASC")
+    fun categoryList(): List<CategoryTableView>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLanguageList(items: List<LanguageTableItem>)
 
@@ -40,6 +46,12 @@ interface AppPokemonsDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTypes(items: List<PokemonTypeTableItem>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertCategories(items: List<CategoryTableItem>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertCategoryPokemons(items: List<CategoryPokemonTableItem>)
+
     @Query("DELETE FROM languages")
     fun deleteLanguageList()
 
@@ -54,5 +66,11 @@ interface AppPokemonsDatabaseDao {
 
     @Query("DELETE FROM types")
     fun deleteTypes()
+
+    @Query("DELETE FROM categories")
+    fun deleteCategories()
+
+    @Query("DELETE FROM category_pokemons")
+    fun deleteCategoryPokemons()
 
 }

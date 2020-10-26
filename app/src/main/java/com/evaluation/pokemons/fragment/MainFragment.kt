@@ -13,11 +13,9 @@ import com.evaluation.adapter.AdapterItemClickListener
 import com.evaluation.adapter.viewholder.item.BaseItemView
 import com.evaluation.databinding.MainLayoutBinding
 import com.evaluation.pokemons.adapter.viewholder.item.CardItemView
+import com.evaluation.pokemons.model.item.view.types.CategoryView
 import com.evaluation.pokemons.viewmodel.PokemonViewModel
-import com.evaluation.utils.ICONIFIED
-import com.evaluation.utils.QUERY
-import com.evaluation.utils.autoCleared
-import com.evaluation.utils.empty
+import com.evaluation.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
@@ -33,13 +31,15 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
 
     private val viewModel: PokemonViewModel by viewModels()
 
-    private var language: String = empty()
+    private var language: String = emptyString()
 
     private var queryTextChangedJob: Job? = null
 
     private var lastSearchQuery: String? = null
 
     private var isIconified: Boolean = true
+
+    private var lastCategory: CategoryView? = null
 
     override fun onResume() {
         super.onResume()
@@ -62,6 +62,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
         if (iconified != null) {
             isIconified = iconified
         }
+        lastCategory = savedInstanceState?.getParcelable<CategoryView>(CATEGORY)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -69,6 +70,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
             outState.putString(QUERY, lastSearchQuery)
         }
         outState.putBoolean(ICONIFIED, isIconified)
+        outState.putParcelable(CATEGORY, lastCategory)
         super.onSaveInstanceState(outState)
     }
 
@@ -123,7 +125,8 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     }
 
     override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-        viewModel.search(empty())
+        lastCategory = null
+        viewModel.search(emptyString(), lastCategory)
         isIconified = true
         return true
     }
@@ -137,7 +140,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
                 delay(500)
                 if (!query.isNullOrEmpty()) {
                     if (lastSearchQuery != query) {
-                        viewModel.search(query)
+                        viewModel.search(query, lastCategory)
                     }
                 }
                 lastSearchQuery = query
@@ -155,14 +158,20 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     }
 
     override fun languageLoaded(language: String) {
+        lastCategory = null
         this.language = language
         binding.listView.adapter.language = language
-        viewModel.search(empty())
+        viewModel.search(emptyString(), lastCategory)
     }
 
     override fun languageSwitched(language: String) {
         this.language = language
         binding.listView.adapter.language = language
+    }
+
+    override fun categorySwitched(category: CategoryView) {
+        lastCategory = category
+        viewModel.search(emptyString(), lastCategory)
     }
 
     override fun onClicked(item: BaseItemView) {

@@ -20,6 +20,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -57,6 +58,9 @@ object AndroidModule {
         logger.level = HttpLoggingInterceptor.Level.BODY
         return OkHttpClient.Builder()
             .addInterceptor(logger)
+            .connectTimeout(TIMEOUT, TimeUnit.MINUTES)
+            .writeTimeout(TIMEOUT, TimeUnit.MINUTES)
+            .readTimeout(TIMEOUT, TimeUnit.MINUTES)
             .build()
     }
 

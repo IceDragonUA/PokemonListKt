@@ -3,6 +3,9 @@ package com.evaluation.pokemons.mapper
 import com.evaluation.pokemons.model.ResponseResult
 import com.evaluation.pokemons.model.item.database.language.LanguageTableItem
 import com.evaluation.pokemons.model.item.database.pokemon.*
+import com.evaluation.pokemons.model.item.database.types.CategoryPokemonTableItem
+import com.evaluation.pokemons.model.item.database.types.CategoryTableItem
+import com.evaluation.pokemons.model.item.database.types.CategoryTableView
 import com.evaluation.pokemons.model.item.rest.language.Language
 import com.evaluation.pokemons.model.item.rest.language.LanguageName
 import com.evaluation.pokemons.model.item.rest.language.LanguageResult
@@ -10,8 +13,12 @@ import com.evaluation.pokemons.model.item.rest.pokemon.Pokemon
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Ability
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Stat
 import com.evaluation.pokemons.model.item.rest.pokemon.stats.Type
+import com.evaluation.pokemons.model.item.rest.types.TypePokemon
+import com.evaluation.pokemons.model.item.rest.types.TypeResult
+import com.evaluation.pokemons.model.item.view.language.LanguageNameView
 import com.evaluation.pokemons.model.item.view.language.LanguageView
 import com.evaluation.pokemons.model.item.view.pokemon.*
+import com.evaluation.pokemons.model.item.view.types.CategoryView
 import com.evaluation.utils.defIfNull
 import com.evaluation.utils.fromJson
 import com.evaluation.utils.toTypedJson
@@ -25,11 +32,16 @@ import javax.inject.Inject
  */
 class PokemonMapper @Inject constructor(private val gson: Gson) {
 
-    data class Converter(
+    data class PokemonConverter(
         val item: PokemonTableItem,
         val stats: List<PokemonStatTableItem>,
         val abilities: List<PokemonAbilityTableItem>,
         val types: List<PokemonTypeTableItem>
+    )
+
+    data class CategoriesConverter(
+        val item: CategoryTableItem,
+        val pokemons: List<CategoryPokemonTableItem>,
     )
 
     fun toTableItem(item: Pokemon, index: Int): PokemonTableItem {
@@ -118,17 +130,80 @@ class PokemonMapper @Inject constructor(private val gson: Gson) {
         )
     }
 
+    fun toTableItem(item: TypeResult, index: Int): CategoryTableItem {
+        return CategoryTableItem(
+            index = index,
+            name = item.name.defIfNull(),
+        )
+    }
+
+    fun toTableItem(item: TypePokemon, index: Int): CategoryPokemonTableItem {
+        return CategoryPokemonTableItem(
+            index = index,
+            pokemon = gson.toTypedJson(item.pokemonResult, object : TypeToken<Pokemon>() {}.type)
+        )
+    }
+
+    fun toViewItem(item: CategoryTableView): CategoryView {
+        return CategoryView(
+            name = item.name.defIfNull(),
+            pokemons = item.pokemons.map { this.toViewItem(gson.fromJson(it.pokemon) as Pokemon) }
+        )
+    }
+
+    private fun toViewItem(item: Pokemon): PokemonView {
+        return PokemonView(
+            name = item.name.defIfNull(),
+            weight = item.weight.defIfNull(),
+            height = item.height.defIfNull(),
+            experience = item.experience.defIfNull(),
+            front_default = item.sprites.front_default.defIfNull(),
+            back_default = item.sprites.back_default.defIfNull(),
+            stats = item.stats.map { this.toViewItem(it) },
+            abilities = item.abilities.map { this.toViewItem(it) },
+            types = item.types.map { this.toViewItem(it) }
+        )
+    }
+
+    private fun toViewItem(item: Stat): PokemonStatView {
+        return PokemonStatView(
+            names = item.langStat.names.map { this.toViewItem(it) }
+        )
+    }
+
+    private fun toViewItem(item: Ability): PokemonAbilityView {
+        return PokemonAbilityView(
+            names = item.langAbility.names.map { this.toViewItem(it) }
+        )
+    }
+
+    private fun toViewItem(item: Type): PokemonTypeView {
+        return PokemonTypeView(
+            names = item.langType.names.map { this.toViewItem(it) }
+        )
+    }
+
     fun bufferedEntity(
         item: PokemonTableItem,
         stats: List<PokemonStatTableItem>,
         abilities: List<PokemonAbilityTableItem>,
         types: List<PokemonTypeTableItem>
-    ): Converter {
-        return Converter(
+    ): PokemonConverter {
+        return PokemonConverter(
             item = item,
             stats = stats,
             abilities = abilities,
             types = types
+        )
+    }
+
+    fun bufferedEntity(
+        item: CategoryTableItem,
+        pokemons: List<CategoryPokemonTableItem>
+    ): CategoriesConverter {
+        return CategoriesConverter(
+            item = item,
+            pokemons = pokemons
         )
     }
 }

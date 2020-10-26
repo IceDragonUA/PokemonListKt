@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import com.evaluation.R
-import com.evaluation.activity.MainActivity
 import com.evaluation.databinding.DetailLayoutBinding
 import com.evaluation.fragment.BaseFragment
-import com.evaluation.pokemons.model.item.view.pokemon.LanguageNameView
+import com.evaluation.pokemons.model.item.view.language.LanguageNameView
 import com.evaluation.pokemons.model.item.view.pokemon.PokemonInfo
+import com.evaluation.pokemons.model.item.view.types.CategoryView
 import com.evaluation.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,7 +24,7 @@ class DetailFragment : BaseFragment() {
 
     private var binding: DetailLayoutBinding by autoCleared()
 
-    private var language: String = empty()
+    private var language: String = emptyString()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +73,8 @@ class DetailFragment : BaseFragment() {
         bindInfo(DetailFragmentArgs.fromBundle(requireArguments()), language)
     }
 
+    override fun categorySwitched(category: CategoryView) {}
+
     private fun bindInfo(fromBundle: DetailFragmentArgs, language: String) {
         bindItem(list((fromBundle.item.stats as List<PokemonInfo>), language), binding.statsValue)
         bindItem(list((fromBundle.item.abilities as List<PokemonInfo>), language), binding.abilitiesValue)
@@ -87,8 +89,8 @@ class DetailFragment : BaseFragment() {
 
     private fun bindItem(list: List<LanguageNameView?>, view: TextView) {
         if (list.isNotEmpty())
-            view.initText(list.joinToString { it?.name ?: empty() }) else
-            view.initText(empty())
+            view.initText(list.joinToString { it?.name ?: emptyString() }) else
+            view.initText(emptyString())
     }
 
 }

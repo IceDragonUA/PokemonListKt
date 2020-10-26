@@ -9,6 +9,7 @@ import com.evaluation.adapter.viewholder.item.NoItemView
 import com.evaluation.pokemons.database.AppPokemonsDatabaseDao
 import com.evaluation.pokemons.mapper.PokemonMapper
 import com.evaluation.pokemons.model.item.view.language.LanguageView
+import com.evaluation.pokemons.model.item.view.types.CategoryView
 import com.evaluation.pokemons.network.AppPokemonsRestApiDao
 import com.evaluation.utils.NO_ITEM
 import com.evaluation.utils.defIfNull
@@ -206,6 +207,60 @@ class AppPokemonsRepository @Inject constructor(
 
                 databaseList.forEach {
                     itemList.add(LanguageView(name = it.name))
+                }
+
+                itemList
+            }.onErrorReturn {
+                Timber.e(it, "Loading error")
+                val itemList: MutableList<LanguageView> = mutableListOf()
+                val databaseList = appDatabaseDao.languageList()
+
+                databaseList.forEach { item ->
+                    itemList.add(LanguageView(name = item.name))
+                }
+
+                itemList
+            }
+    }
+
+    fun typeList(
+        offset: Int,
+        limit: Int
+    ): Single<MutableList<CategoryView>> {
+        return appRestApiDao.typeList(offset = offset, limit = limit)
+            .map { categories ->
+                appDatabaseDao.deleteCategories()
+                appDatabaseDao.deleteCategoryPokemons()
+
+                val types = categories.types.mapIndexed { rawIndex, type ->
+                    val index = offset + rawIndex + 1
+                    val tableItem = mapper.toTableItem(type, index)
+                    val pokemons = type.pokemons.map {
+                        mapper.toTableItem(it, index)
+                    }
+                    mapper.bufferedEntity(tableItem, pokemons)
+                }
+
+                appDatabaseDao.insertCategories(types.map { it.item })
+                types.forEach {
+                    appDatabaseDao.insertCategoryPokemons(it.pokemons)
+                }
+
+                val itemList: MutableList<CategoryView> = mutableListOf()
+                val databaseList = appDatabaseDao.categoryList()
+
+                databaseList.forEach {
+                    itemList.add(mapper.toViewItem(it))
+                }
+
+                itemList
+            }.onErrorReturn { throwable ->
+                Timber.e(throwable, "Loading error")
+                val itemList: MutableList<CategoryView> = mutableListOf()
+                val databaseList = appDatabaseDao.categoryList()
+
+                databaseList.forEach {
+                    itemList.add(mapper.toViewItem(it))
                 }
 
                 itemList

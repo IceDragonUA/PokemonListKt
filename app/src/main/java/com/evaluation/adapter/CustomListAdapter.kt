@@ -7,13 +7,13 @@ import com.evaluation.adapter.diffutils.ItemDiffItemCallback
 import com.evaluation.adapter.factory.TypesFactory
 import com.evaluation.adapter.viewholder.BaseViewHolder
 import com.evaluation.adapter.viewholder.item.BaseItemView
-import com.evaluation.utils.empty
+import com.evaluation.utils.emptyString
 import kotlin.properties.Delegates
 
 class CustomListAdapter constructor(private val typeFactory: TypesFactory, private val listener: AdapterItemClickListener<*>? = null) :
     PagedListAdapter<BaseItemView, BaseViewHolder<BaseItemView>>(ItemDiffItemCallback()) {
 
-    var language: String by Delegates.observable(empty()) { _, _, _ ->
+    var language: String by Delegates.observable(emptyString()) { _, _, _ ->
         notifyDataSetChanged()
     }
 

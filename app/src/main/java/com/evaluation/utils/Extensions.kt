@@ -4,6 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.evaluation.R
 import com.evaluation.glide.GlideApp
+import com.evaluation.pokemons.model.item.view.types.CategoryView
 
 /**
  * @author Vladyslav Havrylenko
@@ -12,7 +13,9 @@ import com.evaluation.glide.GlideApp
 fun String?.defIfNull() = this ?: ""
 fun Int?.defIfNull(def: Int = 0) = this ?: def
 
-fun empty() = ""
+fun emptyString() = ""
+
+fun emptyCategory() = CategoryView(name = emptyString(), pokemons = listOf())
 
 fun ImageView.loadFromUrl(url: String) {
     GlideApp.with(this.context.applicationContext)

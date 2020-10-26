@@ -8,6 +8,8 @@ import com.evaluation.pokemons.model.item.database.pokemon.PokemonAbilityTableIt
 import com.evaluation.pokemons.model.item.database.pokemon.PokemonStatTableItem
 import com.evaluation.pokemons.model.item.database.pokemon.PokemonTableItem
 import com.evaluation.pokemons.model.item.database.pokemon.PokemonTypeTableItem
+import com.evaluation.pokemons.model.item.database.types.CategoryPokemonTableItem
+import com.evaluation.pokemons.model.item.database.types.CategoryTableItem
 import com.evaluation.utils.DATABASE_VERSION
 
 @Database(
@@ -17,7 +19,10 @@ import com.evaluation.utils.DATABASE_VERSION
         PokemonAbilityTableItem::class,
         PokemonTypeTableItem::class,
 
-        LanguageTableItem::class
+        LanguageTableItem::class,
+
+        CategoryTableItem::class,
+        CategoryPokemonTableItem::class
     ],
     version = DATABASE_VERSION
 )

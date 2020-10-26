@@ -2,6 +2,7 @@ package com.evaluation.pokemons.datasource
 
 import androidx.paging.DataSource
 import com.evaluation.adapter.viewholder.item.BaseItemView
+import com.evaluation.utils.emptyCategory
 import com.evaluation.utils.emptyString
 import javax.inject.Inject
 
@@ -10,14 +11,16 @@ import javax.inject.Inject
  * @since 08.10.2020
  */
 
-class AppPokemonDataSourceFactory @Inject constructor(private var dataSource: AppPokemonDataSource) :
+class AppCategoryDataSourceFactory @Inject constructor(private var dataSource: AppCategoryDataSource) :
     DataSource.Factory<Int, BaseItemView>() {
 
     var query = emptyString()
+    var category = emptyCategory()
     var network = dataSource.network
 
     override fun create(): DataSource<Int, BaseItemView> {
         dataSource.query = query
+        dataSource.category = category
         return dataSource
     }
 

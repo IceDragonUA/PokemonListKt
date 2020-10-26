@@ -1,6 +1,7 @@
 package com.evaluation.pokemons.model.item.view.pokemon
 
 import android.os.Parcelable
+import com.evaluation.pokemons.model.item.view.language.LanguageNameView
 import kotlinx.android.parcel.Parcelize
 
 /**

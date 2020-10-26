@@ -22,3 +22,5 @@ const val QUERY = "QUERY"
 const val ICONIFIED = "ICONIFIED"
 const val LANGUAGE = "LANGUAGE"
 const val CATEGORY = "CATEGORY"
+
+const val DEFAULT_POSITION = 0

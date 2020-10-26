@@ -154,7 +154,12 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     }
 
     private fun initLoader() {
-        viewModel.items.observe(viewLifecycleOwner, binding.listView.adapter::submitList)
+        viewModel.items.observe(viewLifecycleOwner) {
+            if (it.isNullOrEmpty()) {
+                binding.listView.scrollToPosition(DEFAULT_POSITION)
+            }
+            binding.listView.adapter.submitList(it)
+        }
     }
 
     override fun languageLoaded(language: String) {

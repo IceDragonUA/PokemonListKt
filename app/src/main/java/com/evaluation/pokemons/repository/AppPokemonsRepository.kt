@@ -3,6 +3,7 @@ package com.evaluation.pokemons.repository
 import android.content.Context
 import com.evaluation.R
 import com.evaluation.adapter.viewholder.item.BaseItemView
+import com.evaluation.adapter.viewholder.item.EmptyItemView
 import com.evaluation.adapter.viewholder.item.NoItemView
 import com.evaluation.executor.ThreadExecutor
 import com.evaluation.utils.LauncherViewState
@@ -14,6 +15,7 @@ import com.evaluation.pokemons.model.item.database.pokemon.PokemonInfoTableItem
 import com.evaluation.pokemons.model.item.database.types.TypeTableItem
 import com.evaluation.pokemons.model.item.rest.pokemon.options.Type
 import com.evaluation.pokemons.network.AppPokemonsRestApiDao
+import com.evaluation.utils.NO_ITEM
 import com.evaluation.utils.defIfNull
 import com.evaluation.utils.fromJson
 import com.google.gson.Gson
@@ -134,6 +136,15 @@ class AppPokemonsRepository @Inject constructor(
                                     abilityList,
                                     typeList
                                 )
+                            )
+                        )
+                    }
+
+                    itemList.ifEmpty {
+                        itemList.add(
+                            EmptyItemView(
+                                index = NO_ITEM + offset + limit,
+                                next = (offset + limit < itemCount)
                             )
                         )
                     }

@@ -129,6 +129,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
         lastCategory = emptyString()
         viewModel.search(emptyString(), lastCategory)
+        binding.listView.scrollToPosition(DEFAULT_POSITION)
         isIconified = true
         return true
     }
@@ -143,6 +144,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
                 if (!query.isNullOrEmpty()) {
                     if (lastSearchQuery != query) {
                         viewModel.search(query, lastCategory)
+                        binding.listView.scrollToPosition(DEFAULT_POSITION)
                     }
                 }
                 lastSearchQuery = query
@@ -156,12 +158,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     }
 
     private fun initLoader() {
-        viewModel.items.observe(viewLifecycleOwner) {
-            if (it.isNullOrEmpty()) {
-                binding.listView.scrollToPosition(DEFAULT_POSITION)
-            }
-            binding.listView.adapter.submitList(it)
-        }
+        viewModel.items.observe(viewLifecycleOwner, binding.listView.adapter::submitList)
     }
 
     override fun languageLoaded(language: String) {
@@ -169,6 +166,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
         this.language = language
         binding.listView.adapter.language = language
         viewModel.search(emptyString(), lastCategory)
+        binding.listView.scrollToPosition(DEFAULT_POSITION)
     }
 
     override fun languageSwitched(language: String) {
@@ -179,6 +177,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     override fun categorySwitched(category: String) {
         lastCategory = category
         viewModel.search(emptyString(), lastCategory)
+        binding.listView.scrollToPosition(DEFAULT_POSITION)
     }
 
     override fun onClicked(item: BaseItemView) {

@@ -137,13 +137,6 @@ class AppPokemonsRepository @Inject constructor(
                             )
                         )
                     }
-                    itemList.ifEmpty {
-                        itemList.add(
-                            NoItemView(
-                                title = context.resources.getString(R.string.result).defIfNull()
-                            )
-                        )
-                    }
 
                     onSuccess(itemList)
                 },

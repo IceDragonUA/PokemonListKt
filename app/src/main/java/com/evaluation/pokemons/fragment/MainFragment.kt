@@ -24,7 +24,8 @@ import kotlinx.coroutines.*
  * @since 09.03.2020
  */
 @AndroidEntryPoint
-class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
+class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>,
+    SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
 
     private var binding: MainLayoutBinding by autoCleared()
 
@@ -129,7 +130,7 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
         lastCategory = emptyString()
         viewModel.search(emptyString(), lastCategory)
-        binding.listView.scrollToPosition(DEFAULT_POSITION)
+        listToDefaultPosition()
         isIconified = true
         return true
     }
@@ -140,11 +141,11 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
         queryTextChangedJob?.cancel()
         if (isAdded) {
             queryTextChangedJob = GlobalScope.launch(Dispatchers.Main) {
-                delay(500)
+                delay(SEARCH_DELAY_MS)
                 if (!query.isNullOrEmpty()) {
                     if (lastSearchQuery != query) {
                         viewModel.search(query, lastCategory)
-                        binding.listView.scrollToPosition(DEFAULT_POSITION)
+                        listToDefaultPosition()
                     }
                 }
                 lastSearchQuery = query
@@ -158,26 +159,34 @@ class MainFragment : BaseFragment(), AdapterItemClickListener<BaseItemView>, Sea
     }
 
     private fun initLoader() {
-        viewModel.items.observe(viewLifecycleOwner, binding.listView.adapter::submitList)
+        viewModel.items.observe(viewLifecycleOwner) {
+            binding.listView.adapter?.submitList(it)
+        }
     }
 
     override fun languageLoaded(language: String) {
         lastCategory = emptyString()
         this.language = language
-        binding.listView.adapter.language = language
+        binding.listView.adapter?.language = language
         viewModel.search(emptyString(), lastCategory)
-        binding.listView.scrollToPosition(DEFAULT_POSITION)
+        listToDefaultPosition()
     }
 
     override fun languageSwitched(language: String) {
         this.language = language
-        binding.listView.adapter.language = language
+        binding.listView.adapter?.language = language
     }
 
     override fun categorySwitched(category: String) {
         lastCategory = category
         viewModel.search(emptyString(), lastCategory)
-        binding.listView.scrollToPosition(DEFAULT_POSITION)
+        listToDefaultPosition()
+    }
+
+    private fun listToDefaultPosition() {
+        Run.after(TIME_SCROLL_MS) {
+            binding.listView.scrollToPosition(DEFAULT_POSITION)
+        }
     }
 
     override fun onClicked(item: BaseItemView) {

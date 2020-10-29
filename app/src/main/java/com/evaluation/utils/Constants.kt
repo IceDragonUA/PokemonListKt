@@ -24,3 +24,5 @@ const val LANGUAGE = "LANGUAGE"
 const val CATEGORY = "CATEGORY"
 
 const val DEFAULT_POSITION = 0
+const val TIME_SCROLL_MS = 100L
+const val SEARCH_DELAY_MS = 500L

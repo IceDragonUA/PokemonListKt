@@ -27,8 +27,8 @@ class CustomRecyclerView : RecyclerView, AdapterItemClickListener<BaseItemView> 
         itemAnimator = null
     }
 
-    override fun getAdapter(): CustomListAdapter =
-        super.getAdapter() as CustomListAdapter
+    override fun getAdapter(): CustomListAdapter? =
+        super.getAdapter() as? CustomListAdapter
 
     override fun onClicked(item: BaseItemView) {
         listener.onClicked(item)

@@ -89,8 +89,17 @@ interface AppPokemonsDatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPokemon(item: PokemonInfoTableItem)
 
-    @Query("SELECT COUNT(`index`) FROM pokemons")
-    fun pokemonListCount(): Int
+    @Query("SELECT `index` FROM pokemon_info ORDER BY `index`")
+    fun pokemonPagedListCount(): Single<List<Int>>
+
+    @Query("SELECT `index` FROM pokemon_info WHERE name LIKE '%' || :filter || '%' ORDER BY `index`")
+    fun pokemonPagedListCount(filter: String): Single<List<Int>>
+
+    @Query("SELECT `index` FROM pokemon_info WHERE `index` IN (:indexes) ORDER BY `index`")
+    fun pokemonPagedListCount(indexes: List<Int>): Single<List<Int>>
+
+    @Query("SELECT `index` FROM pokemon_info WHERE `index` IN (:indexes) AND name LIKE '%' || :filter || '%' ORDER BY `index`")
+    fun pokemonPagedListCount(indexes: List<Int>, filter: String): Single<List<Int>>
 
     @Query("DELETE FROM languages")
     fun deleteLanguageList()

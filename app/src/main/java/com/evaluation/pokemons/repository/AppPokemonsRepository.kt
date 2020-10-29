@@ -6,7 +6,6 @@ import com.evaluation.adapter.viewholder.item.BaseItemView
 import com.evaluation.adapter.viewholder.item.EmptyItemView
 import com.evaluation.adapter.viewholder.item.NoItemView
 import com.evaluation.executor.ThreadExecutor
-import com.evaluation.utils.LauncherViewState
 import com.evaluation.pokemons.adapter.viewholder.item.CardItemView
 import com.evaluation.pokemons.database.AppPokemonsDatabaseDao
 import com.evaluation.pokemons.mapper.PokemonMapper
@@ -15,6 +14,7 @@ import com.evaluation.pokemons.model.item.database.pokemon.PokemonInfoTableItem
 import com.evaluation.pokemons.model.item.database.types.TypeTableItem
 import com.evaluation.pokemons.model.item.rest.pokemon.options.Type
 import com.evaluation.pokemons.network.AppPokemonsRestApiDao
+import com.evaluation.utils.LauncherViewState
 import com.evaluation.utils.NO_ITEM
 import com.evaluation.utils.defIfNull
 import com.evaluation.utils.fromJson
@@ -53,17 +53,21 @@ class AppPokemonsRepository @Inject constructor(
         onSuccess: (MutableList<BaseItemView>) -> Unit,
         onError: (MutableList<BaseItemView>) -> Unit
     ): Disposable {
-        return loadList(category, query, offset, limit)
+        return Single.zip(
+            loadList(category, query, offset, limit),
+            listCount(category, query),
+            { list, count -> Pair(list, count.size) })
             .doOnSubscribe {
                 onPrepared()
             }
             .subscribe(
-                { pokemonList ->
+                { pair ->
+                    val pokemonList = pair.first
+                    val itemCount = pair.second
                     val itemList: MutableList<BaseItemView> = mutableListOf()
                     val statisticList = appDatabaseDao.statisticListView()
                     val abilityList = appDatabaseDao.abilityListView()
                     val typeList = appDatabaseDao.typeListView()
-                    val itemCount = appDatabaseDao.pokemonListCount()
                     pokemonList.forEach {
                         itemList.add(
                             CardItemView(
@@ -114,17 +118,21 @@ class AppPokemonsRepository @Inject constructor(
         onSuccess: (MutableList<BaseItemView>) -> Unit,
         onError: () -> Unit
     ): Disposable {
-        return loadList(category, query, offset, limit)
+        return Single.zip(
+            loadList(category, query, offset, limit),
+            listCount(category, query),
+            { list, count -> Pair(list, count.size) })
             .doOnSubscribe {
                 onPrepared()
             }
             .subscribe(
-                { pokemonList ->
+                { pair ->
+                    val pokemonList = pair.first
+                    val itemCount = pair.second
                     val itemList: MutableList<BaseItemView> = mutableListOf()
                     val statisticList = appDatabaseDao.statisticListView()
                     val abilityList = appDatabaseDao.abilityListView()
                     val typeList = appDatabaseDao.typeListView()
-                    val itemCount = appDatabaseDao.pokemonListCount()
                     pokemonList.forEach {
                         itemList.add(
                             CardItemView(
@@ -185,6 +193,26 @@ class AppPokemonsRepository @Inject constructor(
                     indexes = indexesByCategory(category),
                     offset = offset,
                     limit = limit,
+                    filter = query
+                )))
+    }
+
+    private fun listCount(
+        category: String,
+        query: String,
+    ): Single<List<Int>> {
+        return (if (category.isEmpty())
+            (if (query.isEmpty())
+                appDatabaseDao.pokemonPagedListCount() else
+                appDatabaseDao.pokemonPagedListCount(
+                    filter = query
+                )) else
+            (if (query.isEmpty())
+                appDatabaseDao.pokemonPagedListCount(
+                    indexes = indexesByCategory(category)
+                ) else
+                appDatabaseDao.pokemonPagedListCount(
+                    indexes = indexesByCategory(category),
                     filter = query
                 )))
     }

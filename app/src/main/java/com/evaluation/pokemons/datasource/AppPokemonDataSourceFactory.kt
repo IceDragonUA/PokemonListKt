@@ -14,10 +14,12 @@ class AppPokemonDataSourceFactory @Inject constructor(private var dataSource: Ap
     DataSource.Factory<Int, BaseItemView>() {
 
     var query = emptyString()
+    var category = emptyString()
     var network = dataSource.network
 
     override fun create(): DataSource<Int, BaseItemView> {
         dataSource.query = query
+        dataSource.category = category
         return dataSource
     }
 

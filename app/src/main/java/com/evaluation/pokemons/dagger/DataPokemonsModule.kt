@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.paging.PagedList
 import com.evaluation.database.AppDatabase
 import com.evaluation.executor.BaseExecutor
+import com.evaluation.executor.ThreadExecutor
 import com.evaluation.network.RestApi
+import com.evaluation.network.handler.NetworkHandler
 import com.evaluation.pokemons.database.AppPokemonsDatabaseDao
-import com.evaluation.pokemons.datasource.AppCategoryDataSource
-import com.evaluation.pokemons.datasource.AppCategoryDataSourceFactory
 import com.evaluation.pokemons.datasource.AppPokemonDataSource
 import com.evaluation.pokemons.datasource.AppPokemonDataSourceFactory
 import com.evaluation.pokemons.interaction.AppPokemonsInteraction
@@ -16,6 +16,7 @@ import com.evaluation.pokemons.mapper.PokemonMapper
 import com.evaluation.pokemons.network.AppPokemonsRestApiDao
 import com.evaluation.pokemons.network.AppPokemonsRestApiDaoImpl
 import com.evaluation.pokemons.repository.AppPokemonsRepository
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +30,8 @@ object DataPokemonsModule {
 
     @Singleton
     @Provides
-    fun appRest(appRest: RestApi, executor: BaseExecutor): AppPokemonsRestApiDao = AppPokemonsRestApiDaoImpl(appRest, executor)
+    fun appRest(appRest: RestApi, appDatabase: AppPokemonsDatabaseDao, handler: NetworkHandler, mapper: PokemonMapper): AppPokemonsRestApiDao =
+        AppPokemonsRestApiDaoImpl(appRest, appDatabase, handler, mapper)
 
     @Provides
     @Singleton
@@ -37,28 +39,20 @@ object DataPokemonsModule {
 
     @Singleton
     @Provides
-    fun appRepository(context: Context, mapper: PokemonMapper, remoteDao: AppPokemonsRestApiDao, localDao: AppPokemonsDatabaseDao) =
-        AppPokemonsRepository(context, mapper, remoteDao, localDao)
+    fun appRepository(context: Context, mapper: PokemonMapper, remoteDao: AppPokemonsRestApiDao, localDao: AppPokemonsDatabaseDao, executor: BaseExecutor, gson: Gson) =
+        AppPokemonsRepository(context, mapper, remoteDao, localDao, executor, gson)
 
     @Singleton
     @Provides
-    fun appPokemonDataSource(appRepository: AppPokemonsRepository) = AppPokemonDataSource(appRepository)
+    fun appDataSource(appRepository: AppPokemonsRepository) = AppPokemonDataSource(appRepository)
 
     @Singleton
     @Provides
-    fun appPokemonDataSourceFactory(appDataSource: AppPokemonDataSource) = AppPokemonDataSourceFactory(appDataSource)
+    fun appDataSourceFactory(appDataSource: AppPokemonDataSource) = AppPokemonDataSourceFactory(appDataSource)
 
     @Singleton
     @Provides
-    fun appCategoryDataSource() = AppCategoryDataSource()
-
-    @Singleton
-    @Provides
-    fun appCategoryDataSourceFactory(appDataSource: AppCategoryDataSource) = AppCategoryDataSourceFactory(appDataSource)
-
-    @Singleton
-    @Provides
-    fun appInteraction(pokemonFactory: AppPokemonDataSourceFactory, categoryFactory: AppCategoryDataSourceFactory, config: PagedList.Config, networkExecutor: Executor, repository: AppPokemonsRepository): AppPokemonsInteraction =
-        AppPokemonsInteractionImpl(pokemonFactory, categoryFactory, config, networkExecutor, repository)
+    fun appInteraction(factory: AppPokemonDataSourceFactory, config: PagedList.Config, networkExecutor: Executor, repository: AppPokemonsRepository): AppPokemonsInteraction =
+        AppPokemonsInteractionImpl(factory, config, networkExecutor, repository)
 
 }

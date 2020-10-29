@@ -6,7 +6,7 @@ import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
 import androidx.lifecycle.ViewModel
 import com.evaluation.pokemons.interaction.AppPokemonsInteraction
-import com.evaluation.pokemons.model.item.view.types.CategoryView
+import com.evaluation.utils.emptyString
 
 
 /**
@@ -17,15 +17,13 @@ class PokemonViewModel @ViewModelInject constructor(
     private val interaction: AppPokemonsInteraction
 ) : ViewModel() {
 
-    private var category: CategoryView? = null
+    private var category: String = emptyString()
     private val queryResult = MutableLiveData<String>()
-    private var itemResult = map(queryResult) { query ->
-        category?.let { interaction.categoryList(query, it) } ?: interaction.pokemonList(query)
-    }
+    private var itemResult = map(queryResult) { query -> interaction.pokemonList(query, category) }
     val items = switchMap(itemResult) { it.pagedList }
     val networkState = switchMap(itemResult) { it.networkState }
 
-    fun search(query: String, category: CategoryView?) {
+    fun search(query: String, category: String) {
         this.category = category
         this.queryResult.value = query
     }

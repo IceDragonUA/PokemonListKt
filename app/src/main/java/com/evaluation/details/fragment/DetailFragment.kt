@@ -11,7 +11,6 @@ import com.evaluation.databinding.DetailLayoutBinding
 import com.evaluation.fragment.BaseFragment
 import com.evaluation.pokemons.model.item.view.language.LanguageNameView
 import com.evaluation.pokemons.model.item.view.pokemon.PokemonInfo
-import com.evaluation.pokemons.model.item.view.types.CategoryView
 import com.evaluation.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -73,7 +72,7 @@ class DetailFragment : BaseFragment() {
         bindInfo(DetailFragmentArgs.fromBundle(requireArguments()), language)
     }
 
-    override fun categorySwitched(category: CategoryView) {}
+    override fun categorySwitched(category: String) {}
 
     private fun bindInfo(fromBundle: DetailFragmentArgs, language: String) {
         bindItem(list((fromBundle.item.stats as List<PokemonInfo>), language), binding.statsValue)

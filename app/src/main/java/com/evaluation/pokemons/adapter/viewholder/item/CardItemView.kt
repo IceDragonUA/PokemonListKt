@@ -10,7 +10,7 @@ import com.evaluation.pokemons.model.item.view.pokemon.PokemonView
  */
 data class CardItemView(
     override var index: String,
-    override var next: String? = null,
+    override var next: Boolean = false,
     var viewItem: PokemonView
 ) : BaseItemView {
 

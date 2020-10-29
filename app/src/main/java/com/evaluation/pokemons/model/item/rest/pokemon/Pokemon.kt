@@ -1,8 +1,8 @@
 package com.evaluation.pokemons.model.item.rest.pokemon
 
-import com.evaluation.pokemons.model.item.rest.pokemon.stats.Ability
-import com.evaluation.pokemons.model.item.rest.pokemon.stats.Stat
-import com.evaluation.pokemons.model.item.rest.pokemon.stats.Type
+import com.evaluation.pokemons.model.item.rest.pokemon.options.Ability
+import com.evaluation.pokemons.model.item.rest.pokemon.options.Stat
+import com.evaluation.pokemons.model.item.rest.pokemon.options.Type
 import com.google.gson.annotations.SerializedName
 
 /**

@@ -1,13 +1,17 @@
 package com.evaluation.tests.dao.network
 
-import com.evaluation.executor.TestExecutor
+import android.content.Context
 import com.evaluation.network.RestApi
+import com.evaluation.network.handler.NetworkHandler
+import com.evaluation.pokemons.database.AppPokemonsDatabaseDao
+import com.evaluation.pokemons.mapper.PokemonMapper
 import com.evaluation.pokemons.network.AppPokemonsRestApiDao
 import com.evaluation.pokemons.network.AppPokemonsRestApiDaoImpl
 import com.evaluation.tests.dao.RetrofitMocks
-import com.evaluation.tests.test
+import com.evaluation.tests.dao.RoomMocks
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.Completable
 import junit.framework.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -21,31 +25,41 @@ import org.mockito.MockitoAnnotations
  */
 class AppPokemonsRestApiDaoTest {
 
+    @Mock
+    private lateinit var context: Context
+
     private lateinit var appPokemonsRestApiDao: AppPokemonsRestApiDao
 
     private var appRest: RestApi = RetrofitMocks.appRest
 
+    private lateinit var appDatabaseDao: AppPokemonsDatabaseDao
+
     @Mock
-    private lateinit var executor: TestExecutor
+    private lateinit var networkHandler: NetworkHandler
+
+    @Mock
+    private lateinit var mapper: PokemonMapper
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        appPokemonsRestApiDao = AppPokemonsRestApiDaoImpl(appRest, executor)
-        whenever(executor.mainExecutor).thenReturn(Schedulers.trampoline())
-        whenever(executor.postExecutor).thenReturn(Schedulers.trampoline())
+        appDatabaseDao = RoomMocks.appDatabase(context).appListDao()
+        appPokemonsRestApiDao = AppPokemonsRestApiDaoImpl(
+            appRest,
+            appDatabaseDao,
+            networkHandler,
+            mapper
+        )
     }
 
     @Test
     fun `should do call`() {
         assertNotNull(appRest)
-        assertNotNull(executor)
+        assertNotNull(appDatabaseDao)
+        assertNotNull(networkHandler)
+        assertNotNull(mapper)
         assertNotNull(appPokemonsRestApiDao)
-
-        appPokemonsRestApiDao.typeList(0, 0).test {
-            assertValueCount(1)
-            assertNoErrors()
-            assertComplete()
-        }
+        whenever(appPokemonsRestApiDao.pokemonList(0, 20)).thenReturn(Completable.complete())
+        verify(appPokemonsRestApiDao).pokemonList(0, 20)
     }
 }

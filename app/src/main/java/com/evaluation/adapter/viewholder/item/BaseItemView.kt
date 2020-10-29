@@ -6,7 +6,7 @@ interface BaseItemView {
 
     var index: String
 
-    var next: String?
+    var next: Boolean
 
     fun type(typesFactory: TypesFactory): Int
 

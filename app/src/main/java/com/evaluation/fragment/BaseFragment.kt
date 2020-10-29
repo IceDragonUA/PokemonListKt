@@ -1,7 +1,6 @@
 package com.evaluation.fragment
 
 import androidx.fragment.app.Fragment
-import com.evaluation.pokemons.model.item.view.types.CategoryView
 
 /**
  * @author Vladyslav Havrylenko
@@ -13,6 +12,6 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun languageSwitched(language: String)
 
-    abstract fun categorySwitched(category: CategoryView)
+    abstract fun categorySwitched(category: String)
 
 }

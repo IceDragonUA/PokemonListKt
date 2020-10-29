@@ -9,7 +9,7 @@ import com.evaluation.utils.NO_ITEM
  */
 data class EmptyItemView(
     override var index: String,
-    override var next: String? = null
+    override var next: Boolean = false
 ) : BaseItemView {
 
     override fun type(typesFactory: TypesFactory): Int = typesFactory.type(this)

@@ -3,18 +3,26 @@ package com.evaluation.pokemons.repository
 import android.content.Context
 import com.evaluation.R
 import com.evaluation.adapter.viewholder.item.BaseItemView
-import com.evaluation.adapter.viewholder.item.EmptyItemView
-import com.evaluation.pokemons.adapter.viewholder.item.CardItemView
 import com.evaluation.adapter.viewholder.item.NoItemView
+import com.evaluation.executor.ThreadExecutor
+import com.evaluation.utils.LauncherViewState
+import com.evaluation.pokemons.adapter.viewholder.item.CardItemView
 import com.evaluation.pokemons.database.AppPokemonsDatabaseDao
 import com.evaluation.pokemons.mapper.PokemonMapper
-import com.evaluation.pokemons.model.item.view.language.LanguageView
-import com.evaluation.pokemons.model.item.view.types.CategoryView
+import com.evaluation.pokemons.model.item.database.language.LanguageTableItem
+import com.evaluation.pokemons.model.item.database.pokemon.PokemonInfoTableItem
+import com.evaluation.pokemons.model.item.database.types.TypeTableItem
+import com.evaluation.pokemons.model.item.rest.pokemon.options.Type
 import com.evaluation.pokemons.network.AppPokemonsRestApiDao
-import com.evaluation.utils.NO_ITEM
 import com.evaluation.utils.defIfNull
+import com.evaluation.utils.fromJson
+import com.google.gson.Gson
+import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,61 +35,44 @@ class AppPokemonsRepository @Inject constructor(
     private val context: Context,
     private val mapper: PokemonMapper,
     private val appRestApiDao: AppPokemonsRestApiDao,
-    private val appDatabaseDao: AppPokemonsDatabaseDao
+    private val appDatabaseDao: AppPokemonsDatabaseDao,
+    private val executor: ThreadExecutor,
+    private val gson: Gson
 ) {
+
+    private val compositeDisposable = CompositeDisposable()
 
     fun pokemonListInit(
         offset: Int,
         limit: Int,
         query: String,
+        category: String,
         onPrepared: () -> Unit,
         onSuccess: (MutableList<BaseItemView>) -> Unit,
         onError: (MutableList<BaseItemView>) -> Unit
     ): Disposable {
-        return appRestApiDao.pokemonList(offset = offset, limit = limit)
+        return loadList(category, query, offset, limit)
             .doOnSubscribe {
                 onPrepared()
             }
             .subscribe(
                 { pokemonList ->
-                    appDatabaseDao.deletePokemonList()
-                    appDatabaseDao.deleteStatistic()
-                    appDatabaseDao.deleteAbilities()
-                    appDatabaseDao.deleteTypes()
-
-                    val pokemons = pokemonList.pokemons.mapIndexed { rawIndex, pokemon ->
-                        val index = offset + rawIndex + 1
-                        val tableItem = mapper.toTableItem(pokemon, index)
-                        val stats = pokemon.stats.map {
-                            mapper.toTableItem(it, index)
-                        }
-                        val abilities = pokemon.abilities.map {
-                            mapper.toTableItem(it, index)
-                        }
-                        val types = pokemon.types.map {
-                            mapper.toTableItem(it, index)
-                        }
-                        mapper.bufferedEntity(tableItem, stats, abilities, types)
-                    }
-
-                    appDatabaseDao.insertPokemonList(pokemons.map { it.item })
-                    pokemons.forEach {
-                        appDatabaseDao.insertStatistics(it.stats)
-                        appDatabaseDao.insertAbilities(it.abilities)
-                        appDatabaseDao.insertTypes(it.types)
-                    }
-
-
                     val itemList: MutableList<BaseItemView> = mutableListOf()
-                    val databaseList = if (query.isEmpty())
-                        appDatabaseDao.pokemonList() else
-                        appDatabaseDao.pokemonList(query)
-                    databaseList.forEach {
+                    val statisticList = appDatabaseDao.statisticListView()
+                    val abilityList = appDatabaseDao.abilityListView()
+                    val typeList = appDatabaseDao.typeListView()
+                    val itemCount = appDatabaseDao.pokemonListCount()
+                    pokemonList.forEach {
                         itemList.add(
                             CardItemView(
                                 index = it.index.defIfNull().toString(),
-                                next = pokemonList.next,
-                                viewItem = mapper.toViewItem(it)
+                                next = (offset + limit < itemCount),
+                                viewItem = mapper.toViewItem(
+                                    it,
+                                    statisticList,
+                                    abilityList,
+                                    typeList
+                                )
                             )
                         )
                     }
@@ -99,18 +90,6 @@ class AppPokemonsRepository @Inject constructor(
                     Timber.e(errorMessage, "Loading error")
 
                     val itemList: MutableList<BaseItemView> = mutableListOf()
-                    val databaseList = if (query.isEmpty())
-                        appDatabaseDao.pokemonList() else
-                        appDatabaseDao.pokemonList(query)
-                    databaseList.forEach {
-                        itemList.add(
-                            CardItemView(
-                                index = it.index.defIfNull().toString(),
-                                next = null,
-                                viewItem = mapper.toViewItem(it)
-                            )
-                        )
-                    }
                     itemList.ifEmpty {
                         itemList.add(
                             NoItemView(
@@ -128,58 +107,40 @@ class AppPokemonsRepository @Inject constructor(
         offset: Int,
         limit: Int,
         query: String,
+        category: String,
         onPrepared: () -> Unit,
         onSuccess: (MutableList<BaseItemView>) -> Unit,
         onError: () -> Unit
     ): Disposable {
-        return appRestApiDao.pokemonList(offset = offset, limit = limit)
+        return loadList(category, query, offset, limit)
             .doOnSubscribe {
                 onPrepared()
             }
             .subscribe(
                 { pokemonList ->
-                    val pokemons = pokemonList.pokemons.mapIndexed { rawIndex, pokemon ->
-                        val index = offset + rawIndex + 1
-                        val tableItem = mapper.toTableItem(pokemon, index)
-                        val stats = pokemon.stats.map {
-                            mapper.toTableItem(it, index)
-                        }
-                        val abilities = pokemon.abilities.map {
-                            mapper.toTableItem(it, index)
-                        }
-                        val types = pokemon.types.map {
-                            mapper.toTableItem(it, index)
-                        }
-                        mapper.bufferedEntity(tableItem, stats, abilities, types)
-                    }
-
-                    appDatabaseDao.insertPokemonList(pokemons.map { it.item })
-                    pokemons.forEach {
-                        appDatabaseDao.insertStatistics(it.stats)
-                        appDatabaseDao.insertAbilities(it.abilities)
-                        appDatabaseDao.insertTypes(it.types)
-                    }
-
-
                     val itemList: MutableList<BaseItemView> = mutableListOf()
-                    val databaseList = if (query.isEmpty())
-                        appDatabaseDao.pokemonPagedList(offset, limit) else
-                        appDatabaseDao.pokemonPagedList(offset, limit, query)
-                    databaseList.forEach {
+                    val statisticList = appDatabaseDao.statisticListView()
+                    val abilityList = appDatabaseDao.abilityListView()
+                    val typeList = appDatabaseDao.typeListView()
+                    val itemCount = appDatabaseDao.pokemonListCount()
+                    pokemonList.forEach {
                         itemList.add(
                             CardItemView(
                                 index = it.index.defIfNull().toString(),
-                                next = pokemonList.next,
-                                viewItem = mapper.toViewItem(it)
+                                next = (offset + limit < itemCount),
+                                viewItem = mapper.toViewItem(
+                                    it,
+                                    statisticList,
+                                    abilityList,
+                                    typeList
+                                )
                             )
                         )
                     }
-
                     itemList.ifEmpty {
                         itemList.add(
-                            EmptyItemView(
-                                index = NO_ITEM + pokemonList.next,
-                                next = pokemonList.next
+                            NoItemView(
+                                title = context.resources.getString(R.string.result).defIfNull()
                             )
                         )
                     }
@@ -193,77 +154,99 @@ class AppPokemonsRepository @Inject constructor(
             )
     }
 
-    fun languageList(
+    private fun loadList(
+        category: String,
+        query: String,
         offset: Int,
         limit: Int
-    ): Single<MutableList<LanguageView>> {
-        return appRestApiDao.languageList(offset = offset, limit = limit)
-            .map { languageList ->
-                appDatabaseDao.deleteLanguageList()
-                appDatabaseDao.insertLanguageList(languageList.results.map { mapper.toTableItem(it) })
+    ): Single<List<PokemonInfoTableItem>> {
+        return (if (category.isEmpty())
+            (if (query.isEmpty())
+                appDatabaseDao.pokemonPagedList(
+                    offset = offset,
+                    limit = limit
+                ) else
+                appDatabaseDao.pokemonPagedList(
+                    offset = offset,
+                    limit = limit,
+                    filter = query
+                )) else
+            (if (query.isEmpty())
+                appDatabaseDao.pokemonPagedList(
+                    indexes = indexesByCategory(category),
+                    offset = offset,
+                    limit = limit
+                ) else
+                appDatabaseDao.pokemonPagedList(
+                    indexes = indexesByCategory(category),
+                    offset = offset,
+                    limit = limit,
+                    filter = query
+                )))
+    }
 
-                val itemList: MutableList<LanguageView> = mutableListOf()
-                val databaseList = appDatabaseDao.languageList()
+    private fun indexesByCategory(category: String): List<Int> {
+        return appDatabaseDao.pokemonInfoList()
+            .filter { (gson.fromJson(it.types) as List<Type>).find { type -> type.type.name == category } != null }
+            .map { it.index }
+    }
 
-                databaseList.forEach {
-                    itemList.add(LanguageView(name = it.name))
-                }
-
-                itemList
-            }.onErrorReturn {
+    fun status(
+        offset: Int,
+        limit: Int,
+        status: PublishSubject<LauncherViewState>
+    ): Observable<LauncherViewState> {
+        compositeDisposable.clear()
+        compositeDisposable.add(load(offset, limit, status))
+        return status
+            .subscribeOn(executor.mainExecutor)
+            .observeOn(executor.postExecutor)
+            .onErrorReturn {
                 Timber.e(it, "Loading error")
-                val itemList: MutableList<LanguageView> = mutableListOf()
-                val databaseList = appDatabaseDao.languageList()
-
-                databaseList.forEach { item ->
-                    itemList.add(LanguageView(name = item.name))
-                }
-
-                itemList
+                LauncherViewState.ERROR
             }
     }
 
-    fun typeList(
+    private fun load(
         offset: Int,
-        limit: Int
-    ): Single<MutableList<CategoryView>> {
-        return appRestApiDao.typeList(offset = offset, limit = limit)
-            .map { categories ->
-                appDatabaseDao.deleteCategories()
-                appDatabaseDao.deleteCategoryPokemons()
+        limit: Int,
+        status: PublishSubject<LauncherViewState>
+    ): Disposable {
+        return Completable.fromAction { status.onNext(LauncherViewState.CHECK_CONNECTION) }
+            .andThen(appRestApiDao.checkCloudConnection())
+            .doOnComplete { status.onNext(LauncherViewState.LOAD_LANGUAGE) }
+            .andThen(appRestApiDao.languageList(offset = offset, limit = limit))
+            .doOnComplete { status.onNext(LauncherViewState.LOAD_STATS) }
+            .andThen(appRestApiDao.statisticList(offset = offset, limit = limit))
+            .doOnComplete { status.onNext(LauncherViewState.LOAD_ABILITIES) }
+            .andThen(appRestApiDao.abilityList(offset = offset, limit = limit))
+            .doOnComplete { status.onNext(LauncherViewState.LOAD_TYPES) }
+            .andThen(appRestApiDao.typeList(offset = offset, limit = limit))
+            .doOnComplete { status.onNext(LauncherViewState.LOAD_LIST) }
+            .andThen(appRestApiDao.pokemonList(offset = offset, limit = limit))
+            .doOnComplete { status.onNext(LauncherViewState.FINISHED) }
+            .subscribeOn(executor.mainExecutor)
+            .observeOn(executor.postExecutor)
+            .subscribe()
+    }
 
-                val types = categories.types.mapIndexed { rawIndex, type ->
-                    val index = offset + rawIndex + 1
-                    val tableItem = mapper.toTableItem(type, index)
-                    val pokemons = type.pokemons.map {
-                        mapper.toTableItem(it, index)
-                    }
-                    mapper.bufferedEntity(tableItem, pokemons)
-                }
+    fun loadLanguages(): Single<List<LanguageTableItem>> {
+        return appDatabaseDao.languageList()
+            .subscribeOn(executor.mainExecutor)
+            .observeOn(executor.postExecutor)
+            .onErrorReturn {
+                Timber.e(it, "Loading error")
+                listOf()
+            }
+    }
 
-                appDatabaseDao.insertCategories(types.map { it.item })
-                types.forEach {
-                    appDatabaseDao.insertCategoryPokemons(it.pokemons)
-                }
-
-                val itemList: MutableList<CategoryView> = mutableListOf()
-                val databaseList = appDatabaseDao.categoryList()
-
-                databaseList.forEach {
-                    itemList.add(mapper.toViewItem(it))
-                }
-
-                itemList
-            }.onErrorReturn { throwable ->
-                Timber.e(throwable, "Loading error")
-                val itemList: MutableList<CategoryView> = mutableListOf()
-                val databaseList = appDatabaseDao.categoryList()
-
-                databaseList.forEach {
-                    itemList.add(mapper.toViewItem(it))
-                }
-
-                itemList
+    fun loadCategories(): Single<List<TypeTableItem>> {
+        return appDatabaseDao.categoryList()
+            .subscribeOn(executor.mainExecutor)
+            .observeOn(executor.postExecutor)
+            .onErrorReturn {
+                Timber.e(it, "Loading error")
+                listOf()
             }
     }
 }

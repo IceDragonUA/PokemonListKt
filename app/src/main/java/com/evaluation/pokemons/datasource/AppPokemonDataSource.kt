@@ -22,10 +22,11 @@ class AppPokemonDataSource @Inject constructor(
 ) : PageKeyedDataSource<Int, BaseItemView>() {
 
     var query = emptyString()
+    var category = emptyString()
     val network = MutableLiveData<Boolean>()
 
-    var disposeInit: Disposable? = null
-    var disposePaged: Disposable? = null
+    private var disposeInit: Disposable? = null
+    private var disposePaged: Disposable? = null
 
     override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, BaseItemView>) {
         disposeInit?.dispose()
@@ -34,6 +35,7 @@ class AppPokemonDataSource @Inject constructor(
             offset = PAGE_OFFSET,
             limit = PAGE_SIZE,
             query = query,
+            category = category,
             onPrepared = {
                 postInitialState(NetworkState.LOADING)
             },
@@ -59,6 +61,7 @@ class AppPokemonDataSource @Inject constructor(
             offset = params.key,
             limit = PAGE_SIZE,
             query = query,
+            category = category,
             onPrepared = {
                 postBeforeAfterState(NetworkState.LOADING)
             },
@@ -84,7 +87,7 @@ class AppPokemonDataSource @Inject constructor(
         if (refresh) NetworkState.LOADED else NetworkState.LOADING
 
     private fun populateNextKey(it: MutableList<BaseItemView>, params: LoadParams<Int>) =
-        if (!it.last().next.isNullOrEmpty()) params.key + PAGE_SIZE else null
+        if (!it.last().next) params.key + PAGE_SIZE else null
 
 
 }

@@ -14,4 +14,13 @@
     <string name="stats">Stats: </string>
     <string name="abilities">Abilities: </string>
     <string name="types">Types: </string>
+
+    <string name="launcher_connection">Check connection</string>
+    <string name="launcher_language">Load language</string>
+    <string name="launcher_statistics">Load statistics</string>
+    <string name="launcher_abilities">Load abilities</string>
+    <string name="launcher_types">Load types</string>
+    <string name="launcher_list">Load list</string>
+    <string name="launcher_finished">Loading finished</string>
+    <string name="launcher_error">Loading error</string>
 </resources>

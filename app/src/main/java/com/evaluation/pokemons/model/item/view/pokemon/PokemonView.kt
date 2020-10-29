@@ -1,6 +1,9 @@
 package com.evaluation.pokemons.model.item.view.pokemon
 
 import android.os.Parcelable
+import com.evaluation.pokemons.model.item.view.pokemon.options.PokemonAbilityView
+import com.evaluation.pokemons.model.item.view.pokemon.options.PokemonStatView
+import com.evaluation.pokemons.model.item.view.pokemon.options.PokemonTypeView
 import kotlinx.android.parcel.Parcelize
 
 /**

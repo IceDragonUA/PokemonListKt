@@ -2,6 +2,7 @@ package com.evaluation.pokemons.model.item.database.language
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.evaluation.pokemons.model.item.database.TableItem
 
 /**
  * @author Vladyslav Havrylenko
@@ -9,7 +10,8 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "languages")
 data class LanguageTableItem(
-    @PrimaryKey(autoGenerate = true)
-    var index: Int? = null,
-    val name: String
-)
+    @PrimaryKey
+    var index: Int,
+    val name: String,
+    val url: String
+) : TableItem

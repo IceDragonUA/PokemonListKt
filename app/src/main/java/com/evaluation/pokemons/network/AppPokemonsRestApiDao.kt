@@ -1,16 +1,19 @@
 package com.evaluation.pokemons.network
 
-import com.evaluation.pokemons.model.item.rest.language.LanguageList
-import com.evaluation.pokemons.model.item.rest.pokemon.PokemonList
-import com.evaluation.pokemons.model.item.rest.types.TypePokemonList
-import io.reactivex.Single
+import io.reactivex.Completable
 
 interface AppPokemonsRestApiDao {
 
-    fun pokemonList(offset: Int, limit: Int): Single<PokemonList>
+    fun checkCloudConnection(): Completable
 
-    fun languageList(offset: Int, limit: Int): Single<LanguageList>
+    fun pokemonList(offset: Int, limit: Int): Completable
 
-    fun typeList(offset: Int, limit: Int): Single<TypePokemonList>
+    fun languageList(offset: Int, limit: Int): Completable
+
+    fun statisticList(offset: Int, limit: Int): Completable
+
+    fun abilityList(offset: Int, limit: Int): Completable
+
+    fun typeList(offset: Int, limit: Int): Completable
 
 }

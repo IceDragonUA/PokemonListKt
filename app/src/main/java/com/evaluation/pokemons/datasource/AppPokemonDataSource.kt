@@ -87,7 +87,7 @@ class AppPokemonDataSource @Inject constructor(
         if (refresh) NetworkState.LOADED else NetworkState.LOADING
 
     private fun populateNextKey(it: MutableList<BaseItemView>, params: LoadParams<Int>) =
-        if (!it.last().next) params.key + PAGE_SIZE else null
+        if (it.last().next) params.key + PAGE_SIZE else null
 
 
 }

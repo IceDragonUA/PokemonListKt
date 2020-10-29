@@ -9,9 +9,9 @@ import com.evaluation.pokemons.network.AppPokemonsRestApiDao
 import com.evaluation.pokemons.network.AppPokemonsRestApiDaoImpl
 import com.evaluation.tests.dao.RetrofitMocks
 import com.evaluation.tests.dao.RoomMocks
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import io.reactivex.Completable
+import com.evaluation.tests.test
+import com.evaluation.utils.PAGE_OFFSET
+import com.evaluation.utils.PAGE_SIZE
 import junit.framework.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -25,14 +25,14 @@ import org.mockito.MockitoAnnotations
  */
 class AppPokemonsRestApiDaoTest {
 
-    @Mock
-    private lateinit var context: Context
-
     private lateinit var appPokemonsRestApiDao: AppPokemonsRestApiDao
 
-    private var appRest: RestApi = RetrofitMocks.appRest
+    private lateinit var appRest: RestApi
 
-    private lateinit var appDatabaseDao: AppPokemonsDatabaseDao
+    private lateinit var appDatabase: AppPokemonsDatabaseDao
+
+    @Mock
+    private lateinit var context: Context
 
     @Mock
     private lateinit var networkHandler: NetworkHandler
@@ -43,23 +43,83 @@ class AppPokemonsRestApiDaoTest {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        appDatabaseDao = RoomMocks.appDatabase(context).appListDao()
+        appRest = RetrofitMocks.appRest
+        appDatabase = RoomMocks.appDatabase(context).appListDao()
         appPokemonsRestApiDao = AppPokemonsRestApiDaoImpl(
             appRest,
-            appDatabaseDao,
+            appDatabase,
             networkHandler,
             mapper
         )
     }
 
     @Test
-    fun `should do call`() {
+    fun `load language`() {
         assertNotNull(appRest)
-        assertNotNull(appDatabaseDao)
+        assertNotNull(appDatabase)
         assertNotNull(networkHandler)
         assertNotNull(mapper)
         assertNotNull(appPokemonsRestApiDao)
-        whenever(appPokemonsRestApiDao.pokemonList(0, 20)).thenReturn(Completable.complete())
-        verify(appPokemonsRestApiDao).pokemonList(0, 20)
+
+        appPokemonsRestApiDao.languageList(PAGE_OFFSET, PAGE_SIZE).test {
+            assertNoErrors()
+            assertComplete()
+        }
+    }
+
+    @Test
+    fun `load pokemon`() {
+        assertNotNull(appRest)
+        assertNotNull(appDatabase)
+        assertNotNull(networkHandler)
+        assertNotNull(mapper)
+        assertNotNull(appPokemonsRestApiDao)
+
+        appPokemonsRestApiDao.pokemonList(PAGE_OFFSET, PAGE_SIZE).test {
+            assertNoErrors()
+            assertComplete()
+        }
+    }
+
+    @Test
+    fun `load statistic`() {
+        assertNotNull(appRest)
+        assertNotNull(appDatabase)
+        assertNotNull(networkHandler)
+        assertNotNull(mapper)
+        assertNotNull(appPokemonsRestApiDao)
+
+        appPokemonsRestApiDao.statisticList(PAGE_OFFSET, PAGE_SIZE).test {
+            assertNoErrors()
+            assertComplete()
+        }
+    }
+
+    @Test
+    fun `load ability`() {
+        assertNotNull(appRest)
+        assertNotNull(appDatabase)
+        assertNotNull(networkHandler)
+        assertNotNull(mapper)
+        assertNotNull(appPokemonsRestApiDao)
+
+        appPokemonsRestApiDao.abilityList(PAGE_OFFSET, PAGE_SIZE).test {
+            assertNoErrors()
+            assertComplete()
+        }
+    }
+
+    @Test
+    fun `load type`() {
+        assertNotNull(appRest)
+        assertNotNull(appDatabase)
+        assertNotNull(networkHandler)
+        assertNotNull(mapper)
+        assertNotNull(appPokemonsRestApiDao)
+
+        appPokemonsRestApiDao.typeList(PAGE_OFFSET, PAGE_SIZE).test {
+            assertNoErrors()
+            assertComplete()
+        }
     }
 }

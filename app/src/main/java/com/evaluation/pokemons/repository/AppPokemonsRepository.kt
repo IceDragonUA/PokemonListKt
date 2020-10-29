@@ -143,7 +143,7 @@ class AppPokemonsRepository @Inject constructor(
                     itemList.ifEmpty {
                         itemList.add(
                             EmptyItemView(
-                                index = NO_ITEM + offset + limit,
+                                index = NO_ITEM + (offset + limit),
                                 next = (offset + limit < itemCount)
                             )
                         )
